@@ -1,14 +1,14 @@
-# Serilog.Hosting [![Build status](https://ci.appveyor.com/api/projects/status/4rscdto23ik6vm2r?svg=true)](https://ci.appveyor.com/project/serilog/serilog-hosting) [![NuGet Version](http://img.shields.io/nuget/v/Serilog.Hosting.svg?style=flat)](https://www.nuget.org/packages/Serilog.Hosting/) 
+# Serilog.Extensions.Hosting [![Build status](https://ci.appveyor.com/api/projects/status/4rscdto23ik6vm2r?svg=true)](https://ci.appveyor.com/project/serilog/serilog-hosting) [![NuGet Version](http://img.shields.io/nuget/v/Serilog.Extensions.Hosting.svg?style=flat)](https://www.nuget.org/packages/Serilog.Extensions.Hosting/) 
 
 
 Serilog logging for Microsoft.Extensions.Hosting . This package routes Microsoft.Extensions.Hosting log messages through Serilog, so you can get information about the framework's internal operations logged to the same Serilog sinks as your application events.
 
 ### Instructions
 
-**First**, install the _Serilog.Hosting_ [NuGet package](https://www.nuget.org/packages/Serilog.Hosting) into your app. You will need a way to view the log messages - _Serilog.Sinks.Console_ writes these to the console; there are [many more sinks available](https://www.nuget.org/packages?q=Tags%3A%22serilog%22) on NuGet.
+**First**, install the _Serilog.Extensions.Hosting_ [NuGet package](https://www.nuget.org/packages/Serilog.Extensions.Hosting) into your app. You will need a way to view the log messages - _Serilog.Sinks.Console_ writes these to the console; there are [many more sinks available](https://www.nuget.org/packages?q=Tags%3A%22serilog%22) on NuGet.
 
 ```powershell
-Install-Package Serilog.Hosting -DependencyVersion Highest
+Install-Package Serilog.Extensions.Hosting -DependencyVersion Highest
 Install-Package Serilog.Sinks.Console
 ```
 
@@ -68,7 +68,7 @@ A more complete example, showing _appsettings.json_ configuration, can be found 
 
 ### Using the package
 
-With _Serilog.Hosting_ installed and configured, you can write log messages directly through Serilog or any `ILogger` interface injected by .NET. All loggers will use the same underlying implementation, levels, and destinations.
+With _Serilog.Extensions.Hosting_ installed and configured, you can write log messages directly through Serilog or any `ILogger` interface injected by .NET. All loggers will use the same underlying implementation, levels, and destinations.
 
 **Tip:** change the minimum level for `Microsoft` to `Warning` 
 

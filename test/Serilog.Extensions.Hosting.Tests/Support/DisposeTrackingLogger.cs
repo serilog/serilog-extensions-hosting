@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Serilog.Core;
 using Serilog.Events;
 
-namespace Serilog.Hosting.Tests.Support
+namespace Serilog.Extensions.Hosting.Tests.Support
 {
     public class DisposeTrackingLogger : ILogger, IDisposable
     {

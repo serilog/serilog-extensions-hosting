@@ -18,9 +18,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{9C21B9
 		assets\Serilog.snk = assets\Serilog.snk
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serilog.Hosting", "src\Serilog.Hosting\Serilog.Hosting.csproj", "{0549D23F-986B-4FB2-BACE-16FD7A7BC9EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serilog.Extensions.Hosting", "src\Serilog.Extensions.Hosting\Serilog.Extensions.Hosting.csproj", "{0549D23F-986B-4FB2-BACE-16FD7A7BC9EF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serilog.Hosting.Tests", "test\Serilog.Hosting.Tests\Serilog.Hosting.Tests.csproj", "{AD51759B-CD58-473F-9620-0B0E56A123A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serilog.Extensions.Hosting.Tests", "test\Serilog.Extensions.Hosting.Tests\Serilog.Extensions.Hosting.Tests.csproj", "{AD51759B-CD58-473F-9620-0B0E56A123A1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleServiceSample", "samples\SimpleServiceSample\SimpleServiceSample.csproj", "{E5A82756-4619-4E6B-8B26-6D83E00E99F0}"
 EndProject

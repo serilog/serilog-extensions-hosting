@@ -7,11 +7,11 @@
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>Serilog.Hosting</AssemblyName>
+    <AssemblyName>Serilog.Extensions.Hosting</AssemblyName>
     <AssemblyOriginatorKeyFile>../../assets/Serilog.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>Serilog.Hosting</PackageId>
+    <PackageId>Serilog.Extensions.Hosting</PackageId>
     <PackageTags>serilog;aspnet;aspnetcore;hosting</PackageTags>
     <PackageIconUrl>http://serilog.net/images/serilog-extension-nuget.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/serilog/serilog-hosting</PackageProjectUrl>

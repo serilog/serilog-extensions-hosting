@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
-    <AssemblyName>Serilog.Hosting.Tests</AssemblyName>
+    <AssemblyName>Serilog.Extensions.Hosting.Tests</AssemblyName>
     <AssemblyOriginatorKeyFile>../../assets/Serilog.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Serilog.Hosting\Serilog.Hosting.csproj" />
+    <ProjectReference Include="..\..\src\Serilog.Extensions.Hosting\Serilog.Extensions.Hosting.csproj" />
   </ItemGroup>
 
   <ItemGroup>

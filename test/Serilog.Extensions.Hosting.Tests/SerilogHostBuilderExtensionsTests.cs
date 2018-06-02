@@ -3,7 +3,7 @@
 
 using Xunit;
 
-namespace Serilog.Hosting.Tests
+namespace Serilog.Extensions.Hosting.Tests
 {
     public class SerilogHostBuilderExtensionsTests
     {

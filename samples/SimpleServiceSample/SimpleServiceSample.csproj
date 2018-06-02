@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Serilog.Hosting\Serilog.Hosting.csproj" />
+    <ProjectReference Include="..\..\src\Serilog.Extensions.Hosting\Serilog.Extensions.Hosting.csproj" />
   </ItemGroup>
 
   <ItemGroup>
