@@ -15,7 +15,7 @@
 using System;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Serilog.AspNetCore;
+using Serilog.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Serilog

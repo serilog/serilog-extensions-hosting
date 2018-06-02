@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 using Serilog.Debugging;
 using Serilog.Extensions.Logging;
 
-namespace Serilog.AspNetCore
+namespace Serilog.Hosting
 {
     /// <summary>
     /// Implements <see cref="ILoggerFactory"/> so that we can inject Serilog Logger.
