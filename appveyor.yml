@@ -1,16 +1,10 @@
 version: '{build}'
 skip_tags: true
-image: Visual Studio 2017 Preview
+image: Visual Studio 2017
 configuration: Release
-install:
-  - ps: mkdir -Force ".\build\" | Out-Null
-  #- ps: Invoke-WebRequest "https://raw.githubusercontent.com/dotnet/cli/release/2.0.0/scripts/obtain/dotnet-install.ps1" -OutFile ".\build\installcli.ps1"
-  #- ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetcli"
-  #- ps: '& .\build\installcli.ps1 -InstallDir "$env:DOTNET_INSTALL_DIR" -NoPath -Version 2.0.0-preview2-006497'
-  #- ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
+test: off
 build_script:
 - ps: ./Build.ps1
-test: off
 artifacts:
 - path: artifacts/Serilog.*.nupkg
 deploy:
@@ -26,4 +20,4 @@ deploy:
   artifact: /Serilog.*\.nupkg/
   tag: v$(appveyor_build_version)
   on:
-    branch: master
+branch: master
