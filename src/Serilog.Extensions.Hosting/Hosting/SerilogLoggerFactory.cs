@@ -29,8 +29,8 @@ namespace Serilog.Hosting
         /// Initializes a new instance of the <see cref="SerilogLoggerFactory"/> class.
         /// </summary>
         /// <param name="logger">The Serilog logger; if not supplied, the static <see cref="Serilog.Log"/> will be used.</param>
-        /// <param name="dispose">When true, dispose <paramref name="logger"/> when the framework disposes the provider. If the
-        /// logger is not specified but <paramref name="dispose"/> is true, the <see cref="Log.CloseAndFlush()"/> method will be
+        /// <param name="dispose">When <c>true</c>, dispose <paramref name="logger"/> when the framework disposes the provider. If the
+        /// logger is not specified but <paramref name="dispose"/> is <c>true</c>, the <see cref="Log.CloseAndFlush()"/> method will be
         /// called on the static <see cref="Log"/> class instead.</param>
         public SerilogLoggerFactory(ILogger logger = null, bool dispose = false)
         {
@@ -63,7 +63,7 @@ namespace Serilog.Hosting
         /// <param name="provider">The <see cref="T:Microsoft.Extensions.Logging.ILoggerProvider" />.</param>
         public void AddProvider(ILoggerProvider provider)
         {
-            SelfLog.WriteLine("Ignoring added logger provider {0}", provider);
+            SelfLog.WriteLine("Ignoring add logger provider {0}", provider);
         }
     }
 }
