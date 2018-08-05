@@ -54,7 +54,7 @@ public class Program
 }
 ```
 
-**Finally**, clean up by removing the rema `"Logging"` section from _appsettings.json_ files (this can be replaced with [Serilog configuration](https://github.com/serilog/serilog-settings-configuration) as shown in [this example](https://github.com/serilog/serilog-hosting/blob/dev/samples/SimpleServiceSample/Program.cs), if required)
+**Finally**, clean up by removing the remaining `"Logging"` section from _appsettings.json_ files (this can be replaced with [Serilog configuration](https://github.com/serilog/serilog-settings-configuration) as shown in [this example](https://github.com/serilog/serilog-extensions-hosting/blob/dev/samples/SimpleServiceSample/Program.cs), if required)
 
 That's it! You will see log output like:
 
