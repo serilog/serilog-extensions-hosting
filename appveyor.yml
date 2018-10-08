@@ -13,6 +13,7 @@ only_commits:
     - src/Serilog.Extensions.Hosting/
     - Build.ps1
     - assets/
+    - test/Serilog.Extensions.Hosting.Tests/
 deploy:
 - provider: NuGet
   api_key:
