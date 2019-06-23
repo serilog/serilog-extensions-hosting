@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel;
 using Microsoft.Extensions.Logging;
 using Serilog.Debugging;
 using Serilog.Extensions.Logging;
@@ -26,6 +27,7 @@ namespace Serilog.Hosting
     /// Implements <see cref="ILoggerFactory"/> so that we can inject Serilog Logger.
     /// </summary>
     [Obsolete("Replaced with Serilog.Extensions.Logging.SerilogLoggerFactory")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class SerilogLoggerFactory : ILoggerFactory
     {
         readonly SerilogLoggerProvider _provider;

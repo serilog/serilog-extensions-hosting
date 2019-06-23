@@ -63,6 +63,12 @@ namespace Serilog
                 {
                     collection.AddSingleton<ILoggerFactory>(services => new SerilogLoggerFactory(logger, dispose));
                 }
+
+                if (logger != null)
+                {
+                    // This won't (and shouldn't) take ownership of the logger. 
+                    collection.AddSingleton(logger);
+                }
             });
 
             return builder;
@@ -103,6 +109,9 @@ namespace Serilog
                 configureLogger(context, loggerConfiguration);
                 var logger = loggerConfiguration.CreateLogger();
                 
+                // This won't (and shouldn't) take ownership of the logger. 
+                collection.AddSingleton(logger);
+
                 ILogger registeredLogger = null;
                 if (preserveStaticLogger)
                 {
