@@ -22,15 +22,15 @@ namespace Serilog.Extensions.Hosting
     /// </summary>
     public class DiagnosticContext : IDiagnosticContext
     {
-        readonly ILogger _log;
+        readonly ILogger _logger;
 
         /// <summary>
         /// Construct a <see cref="DiagnosticContext"/>.
         /// </summary>
-        /// <param name="log">A logger for binding properties in the context, or <c>null</c> to use <see cref="Log.Logger"/>.</param>
-        public DiagnosticContext(ILogger log)
+        /// <param name="logger">A logger for binding properties in the context, or <c>null</c> to use <see cref="Log.Logger"/>.</param>
+        public DiagnosticContext(ILogger logger)
         {
-            _log = log;
+            _logger = logger;
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Serilog.Extensions.Hosting
 
             var collector = AmbientDiagnosticContextCollector.Current;
             if (collector != null && 
-                (_log ?? Log.Logger).BindProperty(propertyName, value, destructureObjects, out var property))
+                (_logger ?? Log.Logger).BindProperty(propertyName, value, destructureObjects, out var property))
             {
                 collector.Add(property);
             }

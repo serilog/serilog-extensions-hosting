@@ -16,6 +16,7 @@ using System;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog.Extensions.Hosting;
 using Serilog.Extensions.Logging;
 
 namespace Serilog
@@ -64,11 +65,7 @@ namespace Serilog
                     collection.AddSingleton<ILoggerFactory>(services => new SerilogLoggerFactory(logger, dispose));
                 }
 
-                if (logger != null)
-                {
-                    // This won't (and shouldn't) take ownership of the logger. 
-                    collection.AddSingleton(logger);
-                }
+                ConfigureServices(collection, logger);
             });
 
             return builder;
@@ -80,7 +77,7 @@ namespace Serilog
         /// The logger will be shut down when application services are disposed.
         /// </remarks>
         /// <param name="builder">The host builder to configure.</param>
-        /// <param name="configureLogger">The delegate for configuring the <see cref="LoggerConfiguration" /> that will be used to construct a <see cref="Logger" />.</param>
+        /// <param name="configureLogger">The delegate for configuring the <see cref="LoggerConfiguration" /> that will be used to construct a <see cref="Microsoft.Extensions.Logging.Logger" />.</param>
         /// <param name="preserveStaticLogger">Indicates whether to preserve the value of <see cref="Log.Logger"/>.</param>
         /// <param name="writeToProviders">By default, Serilog does not write events to <see cref="ILoggerProvider"/>s registered through
         /// the Microsoft.Extensions.Logging API. Normally, equivalent Serilog sinks are used in place of providers. Specify
@@ -109,9 +106,6 @@ namespace Serilog
                 configureLogger(context, loggerConfiguration);
                 var logger = loggerConfiguration.CreateLogger();
                 
-                // This won't (and shouldn't) take ownership of the logger. 
-                collection.AddSingleton(logger);
-
                 ILogger registeredLogger = null;
                 if (preserveStaticLogger)
                 {
@@ -136,8 +130,30 @@ namespace Serilog
 
                     return factory;
                 });
+
+                ConfigureServices(collection, logger);
             });
             return builder;
+        }
+
+        static void ConfigureServices(IServiceCollection collection, ILogger logger)
+        {
+            if (collection == null) throw new ArgumentNullException(nameof(collection));
+
+            if (logger != null)
+            {
+                // This won't (and shouldn't) take ownership of the logger. 
+                collection.AddSingleton(logger);
+            }
+
+            // Registered to provide two services...
+            var diagnosticContext = new DiagnosticContext(logger);
+
+            // Consumed by e.g. middleware
+            collection.AddSingleton(diagnosticContext);
+
+            // Consumed by user code
+            collection.AddSingleton<IDiagnosticContext>(diagnosticContext);
         }
     }
 }
