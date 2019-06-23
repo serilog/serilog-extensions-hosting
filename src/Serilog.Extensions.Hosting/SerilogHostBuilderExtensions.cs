@@ -31,8 +31,8 @@ namespace Serilog
         /// </summary>
         /// <param name="builder">The host builder to configure.</param>
         /// <param name="logger">The Serilog logger; if not supplied, the static <see cref="Serilog.Log"/> will be used.</param>
-        /// <param name="dispose">When true, dispose <paramref name="logger"/> when the framework disposes the provider. If the
-        /// logger is not specified but <paramref name="dispose"/> is true, the <see cref="Log.CloseAndFlush()"/> method will be
+        /// <param name="dispose">When <c>true</c>, dispose <paramref name="logger"/> when the framework disposes the provider. If the
+        /// logger is not specified but <paramref name="dispose"/> is <c>true</c>, the <see cref="Log.CloseAndFlush()"/> method will be
         /// called on the static <see cref="Log"/> class instead.</param>
         /// <param name="providers">A <see cref="LoggerProviderCollection"/> registered in the Serilog pipeline using the
         /// <c>WriteTo.Providers()</c> configuration method, enabling other <see cref="ILoggerProvider"/>s to receive events. By
