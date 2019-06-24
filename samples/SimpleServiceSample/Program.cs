@@ -1,11 +1,11 @@
 using System;
 using System.IO;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
-using Serilog;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Serilog;
 
-namespace SimpleWebSample
+namespace SimpleServiceSample
 {
     public class Program
     {

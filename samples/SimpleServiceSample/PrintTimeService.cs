@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace SimpleWebSample
+namespace SimpleServiceSample
 {
     public class PrintTimeService : IHostedService, IDisposable
     {
