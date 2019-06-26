@@ -10,6 +10,7 @@ namespace Serilog.Extensions.Hosting
     public sealed class DiagnosticContextCollector : IDisposable
     {
         readonly AmbientDiagnosticContextCollector _ambientCollector;
+        readonly object _propertiesLock = new object();
         List<LogEventProperty> _properties = new List<LogEventProperty>();
 
         internal DiagnosticContextCollector(AmbientDiagnosticContextCollector ambientCollector)
@@ -24,7 +25,11 @@ namespace Serilog.Extensions.Hosting
         public void Add(LogEventProperty property)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
-            _properties?.Add(property);
+
+            lock (_propertiesLock)
+            {
+                _properties?.Add(property);
+            }
         }
 
         /// <summary>
@@ -36,10 +41,13 @@ namespace Serilog.Extensions.Hosting
         /// <returns>True if properties could be collected.</returns>
         public bool TryComplete(out List<LogEventProperty> properties)
         {
-            properties = _properties;
-            _properties = null;
-            Dispose();
-            return properties != null;
+            lock (_propertiesLock)
+            {
+                properties = _properties;
+                _properties = null;
+                Dispose();
+                return properties != null;
+            }
         }
 
         /// <inheritdoc/>
