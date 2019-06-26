@@ -20,12 +20,13 @@ namespace Serilog
     public interface IDiagnosticContext
     {
         /// <summary>
-        /// Add the specified property to the request's diagnostic payload.
+        /// Set the specified property on the current diagnostic context. The property will be collected
+        /// and attached to the event emitted at the completion of the context.
         /// </summary>
         /// <param name="propertyName">The name of the property. Must be non-empty.</param>
         /// <param name="value">The property value.</param>
         /// <param name="destructureObjects">If true, the value will be serialized as structured
         /// data if possible; if false, the object will be recorded as a scalar or simple array.</param>
-        void Add(string propertyName, object value, bool destructureObjects = false); 
+        void Set(string propertyName, object value, bool destructureObjects = false); 
     }
 }

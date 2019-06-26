@@ -13,14 +13,15 @@
 // limitations under the License.
 
 using System;
+using System.Threading;
 
 namespace Serilog.Extensions.Hosting
 {
     /// <summary>
-    /// Implements an ambient/async-local diagnostic context. Consumers should
-    /// use <see cref="IDiagnosticContext"/> in preference to this concrete type.
+    /// Implements an ambient diagnostic context using <see cref="AsyncLocal{T}"/>.
     /// </summary>
-    public class DiagnosticContext : IDiagnosticContext
+    /// <remarks>Consumers should use <see cref="IDiagnosticContext"/> to set context properties.</remarks>
+    public sealed class DiagnosticContext : IDiagnosticContext
     {
         readonly ILogger _logger;
 
@@ -34,17 +35,17 @@ namespace Serilog.Extensions.Hosting
         }
 
         /// <summary>
-        /// Start collecting properties to associate with the current async context. This will replace
+        /// Start collecting properties to associate with the current diagnostic context. This will replace
         /// the active collector, if any.
         /// </summary>
-        /// <returns>A collector that will receive events added in the current async context.</returns>
+        /// <returns>A collector that will receive properties added in the current diagnostic context.</returns>
         public DiagnosticContextCollector BeginCollection()
         {
             return AmbientDiagnosticContextCollector.Begin();
         }
 
-        /// <inheritdoc cref="IDiagnosticContext.Add"/>
-        public void Add(string propertyName, object value, bool destructureObjects = false)
+        /// <inheritdoc cref="IDiagnosticContext.Set"/>
+        public void Set(string propertyName, object value, bool destructureObjects = false)
         {
             if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
 
@@ -52,7 +53,7 @@ namespace Serilog.Extensions.Hosting
             if (collector != null && 
                 (_logger ?? Log.Logger).BindProperty(propertyName, value, destructureObjects, out var property))
             {
-                collector.Add(property);
+                collector.AddOrUpdate(property);
             }
         }
     }

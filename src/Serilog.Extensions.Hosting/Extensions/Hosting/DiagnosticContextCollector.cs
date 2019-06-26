@@ -9,22 +9,33 @@ namespace Serilog.Extensions.Hosting
     /// </summary>
     public sealed class DiagnosticContextCollector : IDisposable
     {
-        readonly AmbientDiagnosticContextCollector _ambientCollector;
-        List<LogEventProperty> _properties = new List<LogEventProperty>();
+        readonly IDisposable _chainedDisposable;
+        readonly object _propertiesLock = new object();
+        Dictionary<string, LogEventProperty> _properties = new Dictionary<string, LogEventProperty>();
 
-        internal DiagnosticContextCollector(AmbientDiagnosticContextCollector ambientCollector)
+        /// <summary>
+        /// Construct a <see cref="DiagnosticContextCollector"/>.
+        /// </summary>
+        /// <param name="chainedDisposable">An object that will be disposed to signal completion/disposal of
+        /// the collector.</param>
+        public DiagnosticContextCollector(IDisposable chainedDisposable)
         {
-            _ambientCollector = ambientCollector ?? throw new ArgumentNullException(nameof(ambientCollector));
+            _chainedDisposable = chainedDisposable ?? throw new ArgumentNullException(nameof(chainedDisposable));
         }
 
         /// <summary>
         /// Add the property to the context.
         /// </summary>
         /// <param name="property">The property to add.</param>
-        public void Add(LogEventProperty property)
+        public void AddOrUpdate(LogEventProperty property)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
-            _properties?.Add(property);
+
+            lock (_propertiesLock)
+            {
+                if (_properties == null) return;
+                _properties[property.Name] = property;
+            }
         }
 
         /// <summary>
@@ -34,18 +45,21 @@ namespace Serilog.Extensions.Hosting
         /// </summary>
         /// <param name="properties">The collected properties, or null if no collection is active.</param>
         /// <returns>True if properties could be collected.</returns>
-        public bool TryComplete(out List<LogEventProperty> properties)
+        public bool TryComplete(out IEnumerable<LogEventProperty> properties)
         {
-            properties = _properties;
-            _properties = null;
-            Dispose();
-            return properties != null;
+            lock (_propertiesLock)
+            {
+                properties = _properties?.Values;
+                _properties = null;
+                Dispose();
+                return properties != null;
+            }
         }
 
         /// <inheritdoc/>
         public void Dispose()
         {
-            _ambientCollector.Dispose();
+            _chainedDisposable.Dispose();
         }
     }
 }
