@@ -9,26 +9,42 @@ namespace Serilog.Extensions.Hosting
     /// </summary>
     public sealed class DiagnosticContextCollector : IDisposable
     {
-        readonly AmbientDiagnosticContextCollector _ambientCollector;
+        readonly IDisposable _chainedDisposable;
         readonly object _propertiesLock = new object();
         List<LogEventProperty> _properties = new List<LogEventProperty>();
 
-        internal DiagnosticContextCollector(AmbientDiagnosticContextCollector ambientCollector)
+        /// <summary>
+        /// Construct a <see cref="DiagnosticContextCollector"/>.
+        /// </summary>
+        /// <param name="chainedDisposable">An object that will be disposed to signal completion/disposal of
+        /// the collector.</param>
+        public DiagnosticContextCollector(IDisposable chainedDisposable)
         {
-            _ambientCollector = ambientCollector ?? throw new ArgumentNullException(nameof(ambientCollector));
+            _chainedDisposable = chainedDisposable ?? throw new ArgumentNullException(nameof(chainedDisposable));
         }
 
         /// <summary>
         /// Add the property to the context.
         /// </summary>
         /// <param name="property">The property to add.</param>
-        public void Add(LogEventProperty property)
+        public void AddOrUpdate(LogEventProperty property)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
             lock (_propertiesLock)
             {
-                _properties?.Add(property);
+                if (_properties == null) return;
+
+                for (var i = 0; i < _properties.Count; ++i)
+                {
+                    if (_properties[i].Name == property.Name)
+                    {
+                        _properties[i] = property;
+                        return;
+                    }
+                }
+
+                _properties.Add(property);
             }
         }
 
@@ -53,7 +69,7 @@ namespace Serilog.Extensions.Hosting
         /// <inheritdoc/>
         public void Dispose()
         {
-            _ambientCollector.Dispose();
+            _chainedDisposable.Dispose();
         }
     }
 }
