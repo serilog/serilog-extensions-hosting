@@ -1,6 +1,6 @@
 # Serilog.Extensions.Hosting [![Build status](https://ci.appveyor.com/api/projects/status/ue4s7htjwj88fulh?svg=true)](https://ci.appveyor.com/project/serilog/serilog-extensions-hosting) [![NuGet Version](http://img.shields.io/nuget/v/Serilog.Extensions.Hosting.svg?style=flat)](https://www.nuget.org/packages/Serilog.Extensions.Hosting/) 
 
-Serilog logging for Microsoft.Extensions.Hosting . This package routes Microsoft.Extensions.Hosting log messages through Serilog, so you can get information about the framework's internal operations logged to the same Serilog sinks as your application events.
+Serilog logging for _Microsoft.Extensions.Hosting_. This package routes framework log messages through Serilog, so you can get information about the framework's internal operations written to the same Serilog sinks as your application events.
 
 ### Instructions
 
