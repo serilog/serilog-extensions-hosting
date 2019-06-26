@@ -11,7 +11,7 @@ namespace Serilog.Extensions.Hosting
     {
         readonly IDisposable _chainedDisposable;
         readonly object _propertiesLock = new object();
-        List<LogEventProperty> _properties = new List<LogEventProperty>();
+        Dictionary<string, LogEventProperty> _properties = new Dictionary<string, LogEventProperty>();
 
         /// <summary>
         /// Construct a <see cref="DiagnosticContextCollector"/>.
@@ -34,17 +34,7 @@ namespace Serilog.Extensions.Hosting
             lock (_propertiesLock)
             {
                 if (_properties == null) return;
-
-                for (var i = 0; i < _properties.Count; ++i)
-                {
-                    if (_properties[i].Name == property.Name)
-                    {
-                        _properties[i] = property;
-                        return;
-                    }
-                }
-
-                _properties.Add(property);
+                _properties[property.Name] = property;
             }
         }
 
@@ -55,11 +45,11 @@ namespace Serilog.Extensions.Hosting
         /// </summary>
         /// <param name="properties">The collected properties, or null if no collection is active.</param>
         /// <returns>True if properties could be collected.</returns>
-        public bool TryComplete(out List<LogEventProperty> properties)
+        public bool TryComplete(out IEnumerable<LogEventProperty> properties)
         {
             lock (_propertiesLock)
             {
-                properties = _properties;
+                properties = _properties?.Values;
                 _properties = null;
                 Dispose();
                 return properties != null;
