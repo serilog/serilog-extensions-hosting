@@ -12,18 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.ComponentModel;
 using Microsoft.Extensions.Logging;
 using Serilog.Debugging;
 using Serilog.Extensions.Logging;
 
+// To line up with the convention used elsewhere in the *.Extensions libraries, this
+// should have been Serilog.Extensions.Hosting.
+// ReSharper disable once CheckNamespace
 namespace Serilog.Hosting
 {
     /// <summary>
     /// Implements <see cref="ILoggerFactory"/> so that we can inject Serilog Logger.
     /// </summary>
+    [Obsolete("Replaced with Serilog.Extensions.Logging.SerilogLoggerFactory")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class SerilogLoggerFactory : ILoggerFactory
     {
-        private readonly SerilogLoggerProvider _provider;
+        readonly SerilogLoggerProvider _provider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SerilogLoggerFactory"/> class.
