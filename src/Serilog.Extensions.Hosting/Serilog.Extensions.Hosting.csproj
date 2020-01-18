@@ -13,6 +13,7 @@
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>Serilog.Extensions.Hosting</PackageId>
     <PackageTags>serilog;aspnet;aspnetcore;hosting</PackageTags>
+    <PackageIcon>serilog-extension-nuget.png</PackageIcon>
     <PackageIconUrl>http://serilog.net/images/serilog-extension-nuget.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/serilog/serilog-extensions-hosting</PackageProjectUrl>
     <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
@@ -21,6 +22,10 @@
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <RootNamespace>Serilog</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="images/serilog-extension-nuget.png" Pack="true" PackagePath="/" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Serilog" Version="2.8.0" />
