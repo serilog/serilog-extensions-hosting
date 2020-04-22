@@ -16,11 +16,11 @@ using System;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog.Extensions.Hosting;
 using Serilog.Extensions.Logging;
 
 namespace Serilog
 {
+
     /// <summary>
     /// Extends <see cref="IHostBuilder"/> with Serilog configuration methods.
     /// </summary>
@@ -39,8 +39,8 @@ namespace Serilog
         /// default, only Serilog sinks will receive events.</param>
         /// <returns>The host builder.</returns>
         public static IHostBuilder UseSerilog(
-            this IHostBuilder builder, 
-            ILogger logger = null, 
+            this IHostBuilder builder,
+            ILogger logger = null,
             bool dispose = false,
             LoggerProviderCollection providers = null)
         {
@@ -48,24 +48,8 @@ namespace Serilog
 
             builder.ConfigureServices((_, collection) =>
             {
-                if (providers != null)
-                {
-                    collection.AddSingleton<ILoggerFactory>(services =>
-                    {
-                        var factory = new SerilogLoggerFactory(logger, dispose, providers);
-
-                        foreach (var provider in services.GetServices<ILoggerProvider>())
-                            factory.AddProvider(provider);
-
-                        return factory;
-                    });
-                }
-                else
-                {
-                    collection.AddSingleton<ILoggerFactory>(services => new SerilogLoggerFactory(logger, dispose));
-                }
-
-                ConfigureServices(collection, logger);
+                collection.AddSerilogLoggerFactory(logger, dispose, providers);
+                collection.AddSerilogServices(logger);
             });
 
             return builder;
@@ -91,7 +75,7 @@ namespace Serilog
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (configureLogger == null) throw new ArgumentNullException(nameof(configureLogger));
-            
+
             builder.ConfigureServices((context, collection) =>
             {
                 var loggerConfiguration = new LoggerConfiguration();
@@ -105,7 +89,7 @@ namespace Serilog
 
                 configureLogger(context, loggerConfiguration);
                 var logger = loggerConfiguration.CreateLogger();
-                
+
                 ILogger registeredLogger = null;
                 if (preserveStaticLogger)
                 {
@@ -131,29 +115,11 @@ namespace Serilog
                     return factory;
                 });
 
-                ConfigureServices(collection, logger);
+                collection.AddSerilogServices(logger);
             });
             return builder;
         }
 
-        static void ConfigureServices(IServiceCollection collection, ILogger logger)
-        {
-            if (collection == null) throw new ArgumentNullException(nameof(collection));
-
-            if (logger != null)
-            {
-                // This won't (and shouldn't) take ownership of the logger. 
-                collection.AddSingleton(logger);
-            }
-
-            // Registered to provide two services...
-            var diagnosticContext = new DiagnosticContext(logger);
-
-            // Consumed by e.g. middleware
-            collection.AddSingleton(diagnosticContext);
-
-            // Consumed by user code
-            collection.AddSingleton<IDiagnosticContext>(diagnosticContext);
-        }
+       
     }
 }
