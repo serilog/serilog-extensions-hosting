@@ -1,7 +1,6 @@
 version: '{build}'
 skip_tags: true
-image: Visual Studio 2017
-configuration: Release
+image: Visual Studio 2019
 test: off
 build_script:
 - ps: ./Build.ps1
