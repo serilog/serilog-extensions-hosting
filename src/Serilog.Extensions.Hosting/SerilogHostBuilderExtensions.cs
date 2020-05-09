@@ -1,4 +1,4 @@
-﻿// Copyright 2020 Serilog Contributors
+// Copyright 2020 Serilog Contributors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -188,8 +188,10 @@ namespace Serilog
                     return factory;
                 });
                 
+                // Null is passed here because we've already (lazily) registered `ILogger`
                 ConfigureServices(collection, null);
             });
+            
             return builder;
         }
 
