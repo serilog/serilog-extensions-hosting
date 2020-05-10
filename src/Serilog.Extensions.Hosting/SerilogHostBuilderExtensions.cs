@@ -26,7 +26,10 @@ namespace Serilog
     /// </summary>
     public static class SerilogHostBuilderExtensions
     {
-        // Used internally to pass information through the container.
+        // Used internally to pass information through the container. We need to do this because if `logger` is the
+        // root logger, registering it as a singleton may lead to disposal along with the container by MEDI. This isn't
+        // always desirable, i.e. we may be handed a logger and `dispose: false`, so wrapping it keeps us in control
+        // of when the logger is disposed.
         class RegisteredLogger
         {
             public RegisteredLogger(ILogger logger)
