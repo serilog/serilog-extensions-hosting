@@ -30,9 +30,7 @@ namespace SimpleServiceSample
             try
             {
                 Log.Information("Getting the motors running...");
-
-                BuildHost(args).Run();
-
+                CreateHostBuilder(args).Build().Run();
                 return 0;
             }
             catch (Exception ex)
@@ -46,11 +44,9 @@ namespace SimpleServiceSample
             }
         }
 
-        public static IHost BuildHost(string[] args) =>
-            new HostBuilder()
-                .ConfigureHostConfiguration(BuildConfiguration)
-                .ConfigureServices(services => services.AddSingleton<IHostedService, PrintTimeService>())
-                .UseSerilog()
-                .Build();
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureServices(services => services.AddHostedService<PrintTimeService>())
+                .UseSerilog();
     }
 }
