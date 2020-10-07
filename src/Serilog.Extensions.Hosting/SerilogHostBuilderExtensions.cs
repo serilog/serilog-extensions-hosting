@@ -18,6 +18,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog.Extensions.Hosting;
 using Serilog.Extensions.Logging;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace Serilog
 {
@@ -85,7 +86,6 @@ namespace Serilog
             return builder;
         }
 
-
         /// <summary>Sets Serilog as the logging provider.</summary>
         /// <remarks>
         /// A <see cref="HostBuilderContext"/> is supplied so that configuration and hosting information can be used.
@@ -125,6 +125,10 @@ namespace Serilog
         /// <param name="writeToProviders">By default, Serilog does not write events to <see cref="ILoggerProvider"/>s registered through
         /// the Microsoft.Extensions.Logging API. Normally, equivalent Serilog sinks are used in place of providers. Specify
         /// <c>true</c> to write events to all providers.</param>
+        /// <remarks>If the static <see cref="Log.Logger"/> is a bootstrap logger (created using
+        /// <see cref="LoggerConfigurationExtensions.CreateBootstrapLogger"/>), and <paramref name="preserveStaticLogger"/> is
+        /// not specified, the the bootstrap logger will be reconfigured through the supplied delegate, rather than being
+        /// replaced entirely or ignored.</remarks>
         /// <returns>The host builder.</returns>
         public static IHostBuilder UseSerilog(
             this IHostBuilder builder,
@@ -134,6 +138,10 @@ namespace Serilog
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (configureLogger == null) throw new ArgumentNullException(nameof(configureLogger));
+            
+            // This check is eager; replacing the bootstrap logger after calling this method is not supported.
+            var reloadable = Log.Logger as ReloadableLogger;
+            var useReload = reloadable != null && !preserveStaticLogger;
             
             builder.ConfigureServices((context, collection) =>
             {
@@ -145,13 +153,30 @@ namespace Serilog
                 
                 collection.AddSingleton(services =>
                 {
-                    var loggerConfiguration = new LoggerConfiguration();
+                    ILogger logger;
+                    if (useReload)
+                    {
+                        reloadable!.Reload(cfg =>
+                        {
+                            if (loggerProviders != null)
+                                cfg.WriteTo.Providers(loggerProviders);
+                            
+                            configureLogger(context, services, cfg);
+                            return cfg;
+                        });
+                        
+                        logger = reloadable.Freeze();
+                    }
+                    else
+                    {
+                        var loggerConfiguration = new LoggerConfiguration();
 
-                    if (loggerProviders != null)
-                        loggerConfiguration.WriteTo.Providers(loggerProviders);
-            
-                    configureLogger(context, services, loggerConfiguration);
-                    var logger = loggerConfiguration.CreateLogger();
+                        if (loggerProviders != null)
+                            loggerConfiguration.WriteTo.Providers(loggerProviders);
+
+                        configureLogger(context, services, loggerConfiguration);
+                        logger = loggerConfiguration.CreateLogger();
+                    }
 
                     return new RegisteredLogger(logger);
                 });
@@ -180,7 +205,7 @@ namespace Serilog
                         Log.Logger = logger;
                     }
 
-                    var factory = new SerilogLoggerFactory(registeredLogger, true, loggerProviders);
+                    var factory = new SerilogLoggerFactory(registeredLogger, !useReload, loggerProviders);
 
                     if (writeToProviders)
                     {

@@ -1,0 +1,8 @@
+2020-10-07 17:04:19.669 +10:00 [INF] Now listening on: https://localhost:5001
+2020-10-07 17:04:19.699 +10:00 [INF] Now listening on: http://localhost:5000
+2020-10-07 17:04:19.700 +10:00 [INF] Application started. Press Ctrl+C to shut down.
+2020-10-07 17:04:19.701 +10:00 [INF] Hosting environment: Development
+2020-10-07 17:04:19.702 +10:00 [INF] Content root path: C:\Development\nblumhardt\serilog-extensions-hosting\samples\WebApplicationSample
+2020-10-07 17:04:19.979 +10:00 [INF] Saying hello
+2020-10-07 17:04:52.511 +10:00 [INF] Application is shutting down...
+2020-10-07 17:04:52.532 +10:00 [INF] Stopped cleanly

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\Serilog.Extensions.Hosting\Serilog.Extensions.Hosting.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="serilog.settings.configuration" Version="3.1.0" />
+      <PackageReference Include="serilog.sinks.console" Version="3.1.1" />
+      <PackageReference Include="serilog.sinks.file" Version="4.1.0" />
+    </ItemGroup>
+
+</Project>
