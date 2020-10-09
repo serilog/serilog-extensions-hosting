@@ -11,6 +11,7 @@ skip_commits:
     - README.md
 deploy:
 - provider: NuGet
+  skip_symbols: true
   api_key:
     secure: wm1N2hx6N0X0f4bae55X83isfINQNHyZkkR1mA/4XIdOJYEDKVonwQrxdgWxwGgl
   on:
