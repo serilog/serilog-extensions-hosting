@@ -65,7 +65,7 @@ That's it! You will see log output like:
 [22:10:39 INF] The current time is: 12/05/2018 10:10:39 +00:00
 ```
 
-A more complete example, showing _appsettings.json_ configuration, can be found in [the sample project here](https://github.com/serilog/serilog-hosting/tree/dev/samples/SimpleServiceSample).
+A more complete example, showing _appsettings.json_ configuration, can be found in [the sample project here](https://github.com/serilog/serilog-extensions-hosting/tree/dev/samples/SimpleServiceSample).
 
 ### Using the package
 
