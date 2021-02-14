@@ -65,7 +65,7 @@ That's it! You will see log output like:
 [22:10:39 INF] The current time is: 12/05/2018 10:10:39 +00:00
 ```
 
-A more complete example, showing _appsettings.json_ configuration, can be found in [the sample project here](https://github.com/serilog/serilog-hosting/tree/dev/samples/SimpleServiceSample).
+A more complete example, showing _appsettings.json_ configuration, can be found in [the sample project here](https://github.com/serilog/serilog-extensions-hosting/tree/dev/samples/SimpleServiceSample).
 
 ### Using the package
 
@@ -79,12 +79,12 @@ You can alternatively configure Serilog using a delegate as shown below:
 
 ```csharp
     // dotnet add package Serilog.Settings.Configuration
-    .UseSerilog((hostingContext, loggerConfiguration) => loggerConfiguration
+    .UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration
         .ReadFrom.Configuration(hostingContext.Configuration)
         .Enrich.FromLogContext()
         .WriteTo.Console())
 ```
 
-This has the advantage of making the `hostingContext`'s `Configuration` object available for configuration of the logger, but at the expense of recording `Exception`s raised earlier in program startup.
+This has the advantage of making the `hostingContext`'s `Configuration` object available for configuration of the logger, but at the expense of ignoring `Exception`s raised earlier in program startup.
 
 If this method is used, `Log.Logger` is assigned implicitly, and closed when the app is shut down.
