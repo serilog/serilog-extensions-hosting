@@ -125,8 +125,8 @@ namespace Serilog
         /// <param name="writeToProviders">By default, Serilog does not write events to <see cref="ILoggerProvider"/>s registered through
         /// the Microsoft.Extensions.Logging API. Normally, equivalent Serilog sinks are used in place of providers. Specify
         /// <c>true</c> to write events to all providers.</param>
-        /// <remarks>If the static <see cref="Log.Logger"/> is a bootstrap logger (created using
-        /// <see cref="LoggerConfigurationExtensions.CreateBootstrapLogger"/>), and <paramref name="preserveStaticLogger"/> is
+        /// <remarks>If the static <see cref="Log.Logger"/> is a bootstrap logger (see
+        /// <c>LoggerConfigurationExtensions.CreateBootstrapLogger()</c>), and <paramref name="preserveStaticLogger"/> is
         /// not specified, the the bootstrap logger will be reconfigured through the supplied delegate, rather than being
         /// replaced entirely or ignored.</remarks>
         /// <returns>The host builder.</returns>
@@ -140,8 +140,12 @@ namespace Serilog
             if (configureLogger == null) throw new ArgumentNullException(nameof(configureLogger));
             
             // This check is eager; replacing the bootstrap logger after calling this method is not supported.
+#if !NO_RELOADABLE_LOGGER
             var reloadable = Log.Logger as ReloadableLogger;
             var useReload = reloadable != null && !preserveStaticLogger;
+#else
+            const bool useReload = false;
+#endif
             
             builder.ConfigureServices((context, collection) =>
             {
@@ -154,6 +158,7 @@ namespace Serilog
                 collection.AddSingleton(services =>
                 {
                     ILogger logger;
+#if !NO_RELOADABLE_LOGGER
                     if (useReload)
                     {
                         reloadable!.Reload(cfg =>
@@ -168,6 +173,7 @@ namespace Serilog
                         logger = reloadable.Freeze();
                     }
                     else
+#endif
                     {
                         var loggerConfiguration = new LoggerConfiguration();
 

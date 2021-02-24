@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if !NO_RELOADABLE_LOGGER
+
 using Microsoft.Extensions.Hosting;
 using Serilog.Extensions.Hosting;
 using System;
@@ -38,3 +40,5 @@ namespace Serilog
         }
     }
 }
+
+#endif

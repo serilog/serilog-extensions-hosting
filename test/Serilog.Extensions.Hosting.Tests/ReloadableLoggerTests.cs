@@ -1,4 +1,6 @@
-﻿using Xunit;
+﻿#if !NO_RELOADABLE_LOGGER
+
+using Xunit;
 
 namespace Serilog.Extensions.Hosting.Tests
 {
@@ -20,3 +22,5 @@ namespace Serilog.Extensions.Hosting.Tests
         }
     }
 }
+
+#endif
