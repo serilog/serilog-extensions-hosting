@@ -7,25 +7,14 @@ using Serilog;
 
 namespace SimpleServiceSample
 {
-    public class Program
+    public static class Program
     {
-        public static Action<IConfigurationBuilder> BuildConfiguration =
-            builder => builder
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
-                .AddEnvironmentVariables();
-
         public static int Main(string[] args)
         {
-            var builder = new ConfigurationBuilder();
-            BuildConfiguration(builder);
-
             Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(builder.Build())
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
-                .CreateLogger();
+                .CreateBootstrapLogger();
 
             try
             {
@@ -47,6 +36,9 @@ namespace SimpleServiceSample
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices(services => services.AddHostedService<PrintTimeService>())
-                .UseSerilog();
+                .UseSerilog((context, services, loggerConfiguration) => loggerConfiguration
+                    .ReadFrom.Configuration(context.Configuration)
+                    .Enrich.FromLogContext()
+                    .WriteTo.Console());
     }
 }

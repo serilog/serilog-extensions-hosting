@@ -20,6 +20,19 @@ namespace Serilog.Extensions.Hosting.Tests
             nested = contextual.ForContext("test", "test");
             Assert.IsType<Core.Logger>(nested);
         }
+        
+        [Fact]
+        public void CachingReloadableLoggerRemainsUsableAfterFreezing()
+        {
+            var logger = new LoggerConfiguration().CreateBootstrapLogger();
+            var contextual = logger.ForContext<ReloadableLoggerTests>();
+            contextual.Information("First");
+            logger.Reload(c => c);
+            logger.Freeze();
+            contextual.Information("Second");
+            contextual.Information("Third");
+            contextual.Information("Fourth"); // No crash :-)
+        }
     }
 }
 

@@ -128,8 +128,7 @@ namespace Serilog.Extensions.Hosting
         {
             if (_frozen)
                 return _cached.ForContext<TSource>();
-
-
+            
             if (_reloadableLogger.CreateChild(
                 _root,
                 this,
@@ -171,11 +170,14 @@ namespace Serilog.Extensions.Hosting
         {
             _root = newRoot;
             _cached = newCached;
-            _frozen = frozen;
                 
             // https://github.com/dotnet/runtime/issues/20500#issuecomment-284774431
-            // Publish `_cached` and `_frozen`. This is useful here because it means that once the logger is frozen - which
+            // Publish `_cached` and then `_frozen`. This is useful here because it means that once the logger is frozen - which
             // we always expect - reads don't require any synchronization/interlocked instructions.
+            Interlocked.MemoryBarrierProcessWide();
+
+            _frozen = frozen;
+
             Interlocked.MemoryBarrierProcessWide();
         }
 
