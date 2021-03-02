@@ -80,7 +80,7 @@ namespace Serilog.Extensions.Hosting
                     throw new InvalidOperationException("The logger is already frozen.");
 
                 _frozen = true;
-                
+
                 // https://github.com/dotnet/runtime/issues/20500#issuecomment-284774431
                 // Publish `_logger` and `_frozen`. This is useful here because it means that once the logger is frozen - which
                 // we always expect - reads don't require any synchronization/interlocked instructions.
@@ -368,12 +368,21 @@ namespace Serilog.Extensions.Hosting
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         (ILogger, bool) UpdateForCaller(ILogger root, ILogger cached, IReloadableLogger caller, out ILogger newRoot, out ILogger newCached, out bool frozen)
         {
+            if (_frozen)
+            {
+                // If we're frozen, then the caller hasn't observed this yet and should update.
+                newRoot = _logger;
+                newCached = caller.ReloadLogger();
+                frozen = true;
+                return (newCached, true);
+            }
+
             if (cached != null && root == _logger)
             {
                 newRoot = default;
                 newCached = default;
-                frozen = _frozen;
-                return (cached, frozen); // If we're frozen, then the caller hasn't observed this yet and should update.
+                frozen = false;
+                return (cached, false);
             }
             
             newRoot = _logger;
