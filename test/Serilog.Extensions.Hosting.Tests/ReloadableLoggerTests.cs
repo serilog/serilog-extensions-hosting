@@ -69,6 +69,39 @@ namespace Serilog.Extensions.Hosting.Tests
             Assert.Equal(3, emittedEvents.Count);
             Assert.Equal(2, emittedEvents.Count(le => le.Level == LogEventLevel.Warning));
         }
+
+        [Fact]
+        public void ReloadableLoggersRecordEnrichment()
+        {
+            var emittedEvents = new List<LogEvent>();
+            
+            var logger = new LoggerConfiguration()
+                .WriteTo.Sink(new ListSink(emittedEvents))
+                .CreateBootstrapLogger();
+
+            var outer = logger
+                .ForContext("A", new object());
+            var inner = outer.ForContext("B", "test");
+            
+            inner.Information("First");
+            
+            logger.Reload(lc => lc.WriteTo.Sink(new ListSink(emittedEvents)));
+            
+            inner.Information("Second");
+
+            logger.Freeze();
+            
+            inner.Information("Third");
+            
+            outer.ForContext("B", "test").Information("Fourth");
+            
+            logger.ForContext("A", new object())
+                .ForContext("B", "test")
+                .Information("Fifth");
+            
+            Assert.Equal(5, emittedEvents.Count);
+            Assert.All(emittedEvents, e => Assert.Equal(2, e.Properties.Count));
+        }
     }
 }
 
