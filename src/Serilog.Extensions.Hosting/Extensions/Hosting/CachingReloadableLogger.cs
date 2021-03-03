@@ -76,7 +76,6 @@ namespace Serilog.Extensions.Hosting
             if (_frozen)
                 return _cached.ForContext(enrichers);
 
-
             if (_reloadableLogger.CreateChild(
                 _root,
                 this,
@@ -100,25 +99,46 @@ namespace Serilog.Extensions.Hosting
             if (_frozen)
                 return _cached.ForContext(propertyName, value, destructureObjects);
 
-            // There's a trade-off, here. Changes to destructuring configuration won't be picked up, but,
-            // it's better to not extend the lifetime of `value` or pass it between threads unexpectedly.
-            var eager = ReloadLogger();
-            if (!eager.BindProperty(propertyName, value, destructureObjects, out var property))
-                return this;
-
-            var enricher = new FixedPropertyEnricher(property);
-            
-            if (_reloadableLogger.CreateChild(
-                _root,
-                this,
-                _cached,
-                p => p.ForContext(enricher),
-                out var child,
-                out var newRoot,
-                out var newCached,
-                out var frozen))
+            ILogger child;
+            if (value == null || value is string || value.GetType().IsPrimitive || value.GetType().IsEnum)
             {
-                Update(newRoot, newCached, frozen);
+                // Safe to extend the lifetime of `value` by closing over it.
+                // This ensures `SourceContext` is passed through appropriately and triggers minimum level overrides.
+                if (_reloadableLogger.CreateChild(
+                    _root,
+                    this,
+                    _cached,
+                    p => p.ForContext(propertyName, value, destructureObjects),
+                    out child,
+                    out var newRoot,
+                    out var newCached,
+                    out var frozen))
+                {
+                    Update(newRoot, newCached, frozen);
+                }
+            }
+            else
+            {
+                // It's not safe to extend the lifetime of `value` or pass it unexpectedly between threads.
+                // Changes to destructuring configuration won't be picked up by the cached logger.
+                var eager = ReloadLogger();
+                if (!eager.BindProperty(propertyName, value, destructureObjects, out var property))
+                    return this;
+
+                var enricher = new FixedPropertyEnricher(property);
+            
+                if (_reloadableLogger.CreateChild(
+                    _root,
+                    this,
+                    _cached,
+                    p => p.ForContext(enricher),
+                    out child,
+                    out var newRoot,
+                    out var newCached,
+                    out var frozen))
+                {
+                    Update(newRoot, newCached, frozen);
+                }
             }
 
             return child;

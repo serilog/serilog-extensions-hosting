@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog.Core;
+using Serilog.Events;
 using Serilog.Extensions.Hosting.Tests.Support;
 using Xunit;
 
@@ -10,10 +12,10 @@ namespace Serilog.Extensions.Hosting.Tests
         [Fact]
         public void SinksAreInjectedFromTheServiceProvider()
         {
-            var sink = new SerilogSink();
+            var emittedEvents = new List<LogEvent>();
             
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddSingleton<ILogEventSink>(sink);
+            serviceCollection.AddSingleton<ILogEventSink>(new ListSink(emittedEvents));
             using var services = serviceCollection.BuildServiceProvider();
 
             using var logger = new LoggerConfiguration()
@@ -22,7 +24,7 @@ namespace Serilog.Extensions.Hosting.Tests
             
             logger.Information("Hello, world!");
             
-            var evt = Assert.Single(sink.Writes);
+            var evt = Assert.Single(emittedEvents);
             Assert.Equal("Hello, world!", evt!.MessageTemplate.Text);
         }
     }

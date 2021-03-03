@@ -1,5 +1,10 @@
 ﻿#if !NO_RELOADABLE_LOGGER
 
+using System.Collections.Generic;
+using System.Linq;
+using Serilog.Core;
+using Serilog.Events;
+using Serilog.Extensions.Hosting.Tests.Support;
 using Xunit;
 
 namespace Serilog.Extensions.Hosting.Tests
@@ -32,6 +37,37 @@ namespace Serilog.Extensions.Hosting.Tests
             contextual.Information("Second");
             contextual.Information("Third");
             contextual.Information("Fourth"); // No crash :-)
+        }
+
+        [Fact]
+        public void ReloadableLoggerRespectsMinimumLevelOverrides()
+        {
+            var emittedEvents = new List<LogEvent>();
+            var logger = new LoggerConfiguration()
+                .MinimumLevel.Override("Test", LogEventLevel.Warning)
+                .WriteTo.Sink(new ListSink(emittedEvents))
+                .CreateBootstrapLogger();
+
+            var limited = logger
+                .ForContext("X", 1)
+                .ForContext(Constants.SourceContextPropertyName, "Test.Stuff");
+            
+            var notLimited = logger.ForContext<ReloadableLoggerTests>();
+            
+            foreach (var context in new[] { limited, notLimited })
+            {
+                // Suppressed by both sinks
+                context.Debug("First");
+
+                // Suppressed by the limited logger
+                context.Information("Second");
+                
+                // Emitted by both loggers
+                context.Warning("Third");
+            }
+            
+            Assert.Equal(3, emittedEvents.Count);
+            Assert.Equal(2, emittedEvents.Count(le => le.Level == LogEventLevel.Warning));
         }
     }
 }
