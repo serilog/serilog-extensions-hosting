@@ -7,13 +7,18 @@ using Serilog.Events;
 
 namespace Serilog.Extensions.Hosting.Tests.Support
 {
-    public class SerilogSink : ILogEventSink
+    public class ListSink : ILogEventSink
     {
-        public List<LogEvent> Writes { get; set; } = new List<LogEvent>();
+        readonly List<LogEvent> _list;
+
+        public ListSink(List<LogEvent> list)
+        {
+            _list = list;
+        }
 
         public void Emit(LogEvent logEvent)
         {
-            Writes.Add(logEvent);
+            _list.Add(logEvent);
         }
     }
 }
