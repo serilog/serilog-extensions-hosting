@@ -24,8 +24,19 @@ namespace ContextAwareServiceSample
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested) {
-                using (_diagnosticContext.Begin("Worker did some work at time {Time}", DateTimeOffset.Now)) {
-                    await _executor.DoWork();
+                var outerOpId = Guid.NewGuid();
+                using (_diagnosticContext.Begin(
+                    "Worker executed operation {OperationId} at time {Time}",
+                    outerOpId, DateTimeOffset.Now)) {
+                    await _executor.DoWork(outerOpId);
+
+                    var innerOpId = Guid.NewGuid();
+                    using (_diagnosticContext.Begin(
+                        "Worker executed inner operation {OperationId} at time {Time}",
+                        innerOpId,
+                        DateTimeOffset.Now)) {
+                        await _executor.DoWork(innerOpId);
+                    }
                 }
 
                 await Task.Delay(1000, stoppingToken);
@@ -42,7 +53,7 @@ namespace ContextAwareServiceSample
             _diagnosticContext = diagnosticContext;
         }
 
-        public async Task DoWork()
+        public async Task DoWork(Guid operationId)
         {
             var R = new Random();
 
@@ -51,7 +62,12 @@ namespace ContextAwareServiceSample
             var randomOperation = operationNames[R.Next(0, operationNames.Length - 1)];
 
             _diagnosticContext.Set("OperationName", randomOperation);
+            _diagnosticContext.Set("ThisOperationId", operationId);
+
             await Task.Delay(R.Next(100, 1000));
+
+            Log.Information("Completed operation {OperationId}: {OperationName}", operationId,
+                randomOperation);
         }
     }
 }

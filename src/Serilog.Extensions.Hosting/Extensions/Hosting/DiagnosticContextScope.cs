@@ -9,7 +9,7 @@ namespace Serilog.Extensions
     /// <summary>
     /// 
     /// </summary>
-    public class DiagnosticContextScope : IDisposable
+    public sealed class DiagnosticContextScope : IDisposable
     {
         readonly LogEventLevel _level;
         readonly string _messageTemplate;
@@ -17,7 +17,7 @@ namespace Serilog.Extensions
         readonly DiagnosticContextCollector _collector;
 
         static readonly LogEventProperty[] NoProperties = new LogEventProperty[0];
-
+        
         /// <summary>
         /// 
         /// </summary>
