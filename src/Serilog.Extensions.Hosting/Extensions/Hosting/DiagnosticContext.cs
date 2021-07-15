@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading;
+using Serilog.Events;
 
 namespace Serilog.Extensions.Hosting
 {
@@ -55,6 +56,17 @@ namespace Serilog.Extensions.Hosting
             {
                 collector.AddOrUpdate(property);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="messageTemplate"></param>
+        /// <param name="properties"></param>
+        /// <returns></returns>
+        public DiagnosticContextScope Begin(string messageTemplate, params object[] properties)
+        {
+            return new DiagnosticContextScope(this, LogEventLevel.Information, messageTemplate, properties);
         }
     }
 }

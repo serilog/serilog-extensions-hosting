@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Serilog.Events;
+using Serilog.Extensions;
+
 namespace Serilog
 {
     /// <summary>
@@ -27,6 +30,12 @@ namespace Serilog
         /// <param name="value">The property value.</param>
         /// <param name="destructureObjects">If true, the value will be serialized as structured
         /// data if possible; if false, the object will be recorded as a scalar or simple array.</param>
-        void Set(string propertyName, object value, bool destructureObjects = false); 
+        void Set(string propertyName, object value, bool destructureObjects = false);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        DiagnosticContextScope Begin(string messageTemplate, params object[] properties);
     }
 }
