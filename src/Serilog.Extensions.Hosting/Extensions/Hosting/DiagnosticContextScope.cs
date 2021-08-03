@@ -47,7 +47,7 @@ namespace Serilog.Extensions
             if (!_collector.TryComplete(out var collectedProperties))
                 collectedProperties = NoProperties;
 
-            foreach(var collectedProp in collectedProperties) {
+            foreach (var collectedProp in collectedProperties) {
                 logger = logger.ForContext(collectedProp.Name, collectedProp.Value);
             }
             
