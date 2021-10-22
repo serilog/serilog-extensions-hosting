@@ -80,7 +80,13 @@ namespace Serilog
                     collection.AddSingleton<ILoggerFactory>(services => new SerilogLoggerFactory(logger, dispose));
                 }
 
-                ConfigureServices(collection, logger);
+                if (logger != null)
+                {
+                    // This won't (and shouldn't) take ownership of the logger. 
+                    collection.AddSingleton(logger);
+                }
+                bool useRegisteredLogger = logger != null;
+                ConfigureDiagnosticContext(collection, useRegisteredLogger);
             });
 
             return builder;
@@ -221,32 +227,26 @@ namespace Serilog
 
                     return factory;
                 });
-                
-                // Null is passed here because we've already (lazily) registered `ILogger`
-                ConfigureServices(collection, null);
+
+                ConfigureDiagnosticContext(collection, preserveStaticLogger);
             });
             
             return builder;
         }
 
-        static void ConfigureServices(IServiceCollection collection, ILogger logger)
+        static void ConfigureDiagnosticContext(IServiceCollection collection, bool useRegisteredLogger)
         {
             if (collection == null) throw new ArgumentNullException(nameof(collection));
 
-            if (logger != null)
-            {
-                // This won't (and shouldn't) take ownership of the logger. 
-                collection.AddSingleton(logger);
-            }
-
-            // Registered to provide two services...
-            var diagnosticContext = new DiagnosticContext(logger);
-
+            // Registered to provide two services...            
             // Consumed by e.g. middleware
-            collection.AddSingleton(diagnosticContext);
-
+            collection.AddSingleton(services =>
+            {
+                ILogger logger = useRegisteredLogger ? services.GetRequiredService<RegisteredLogger>().Logger : null;
+                return new DiagnosticContext(logger);
+            });
             // Consumed by user code
-            collection.AddSingleton<IDiagnosticContext>(diagnosticContext);
+            collection.AddSingleton<IDiagnosticContext>(services => services.GetRequiredService<DiagnosticContext>());
         }
     }
 }
