@@ -32,15 +32,13 @@ namespace Serilog
         void Set(string propertyName, object value, bool destructureObjects = false);
 
         /// <summary>
-        /// Set an exception to include in the Serilog request log event.
+        /// Set the specified exception on the current diagnostic context.
+        /// <br/><br/>
+        /// This is useful when unhandled exceptions do not reach Serilog.AspNetCore's RequestLoggingMiddleware,
+        /// such as when using <a href="https://www.nuget.org/packages/Hellang.Middleware.ProblemDetails">Hellang.Middleware.ProblemDetails</a>
+        /// to transform exceptions to ProblemDetails responses.
         /// </summary>
-        /// <example>
-        /// Passing an exception to the diagnostic context is useful when unhandled exceptions are handled before reaching Serilog's
-        /// RequestLoggingMiddleware. One example is using https://www.nuget.org/packages/Hellang.Middleware.ProblemDetails to transform
-        /// exceptions to ProblemDetails responses.
-        /// </example>
         /// <remarks>
-        /// If an unhandled exception reaches Serilog's RequestLoggingMiddleware, then the unhandled exception takes precedence.<br/>
         /// If <c>null</c> is given, it clears any previously assigned exception.
         /// </remarks>
         /// <param name="exception">The exception to log.</param>

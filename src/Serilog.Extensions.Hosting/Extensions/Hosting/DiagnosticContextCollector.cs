@@ -68,6 +68,7 @@ namespace Serilog.Extensions.Hosting
         /// </summary>
         /// <param name="properties">The collected properties, or null if no collection is active.</param>
         /// <returns>True if properties could be collected.</returns>
+        /// <seealso cref="IDiagnosticContext.Set"/>
         public bool TryComplete(out IEnumerable<LogEventProperty> properties)
         {
             lock (_propertiesLock)
@@ -81,21 +82,15 @@ namespace Serilog.Extensions.Hosting
         }
 
         /// <summary>
-        /// Complete the context and retrieve the properties added to it, if any. This will
+        /// Complete the context and retrieve the properties and exception added to it, if any. This will
         /// stop collection and remove the collector from the original execution context and
         /// any of its children.
         /// </summary>
         /// <param name="properties">The collected properties, or null if no collection is active.</param>
         /// <param name="exception">The collected exception, or null if none has been collected or if no collection is active.</param>
         /// <returns>True if properties could be collected.</returns>
-        /// <example>
-        /// This overload provides the exception collected by the diagnostic context, which is useful when unhandled exceptions are handled
-        /// before reaching Serilog's RequestLoggingMiddleware. One example is using https://www.nuget.org/packages/Hellang.Middleware.ProblemDetails to transform
-        /// exceptions to ProblemDetails responses.
-        /// </example>
-        /// <remarks>
-        /// If an unhandled exception reaches Serilog's RequestLoggingMiddleware, then the unhandled exception should take precedence.<br/>
-        /// </remarks>
+        /// <seealso cref="IDiagnosticContext.Set"/>
+        /// <seealso cref="Serilog.IDiagnosticContext.SetException"/>
         public bool TryComplete(out IEnumerable<LogEventProperty> properties, out Exception exception)
         {
             lock (_propertiesLock)
