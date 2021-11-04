@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Serilog
 {
     /// <summary>
@@ -27,6 +29,21 @@ namespace Serilog
         /// <param name="value">The property value.</param>
         /// <param name="destructureObjects">If true, the value will be serialized as structured
         /// data if possible; if false, the object will be recorded as a scalar or simple array.</param>
-        void Set(string propertyName, object value, bool destructureObjects = false); 
+        void Set(string propertyName, object value, bool destructureObjects = false);
+
+        /// <summary>
+        /// Set an exception to include in the Serilog request log event.
+        /// </summary>
+        /// <example>
+        /// Passing an exception to the diagnostic context is useful when unhandled exceptions are handled before reaching Serilog's
+        /// RequestLoggingMiddleware. One example is using https://www.nuget.org/packages/Hellang.Middleware.ProblemDetails to transform
+        /// exceptions to ProblemDetails responses.
+        /// </example>
+        /// <remarks>
+        /// If an unhandled exception reaches Serilog's RequestLoggingMiddleware, then the unhandled exception takes precedence.<br/>
+        /// If <c>null</c> is given, it clears any previously assigned exception.
+        /// </remarks>
+        /// <param name="exception">The exception to log.</param>
+        void SetException(Exception exception);
     }
 }
