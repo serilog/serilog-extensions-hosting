@@ -34,7 +34,7 @@ namespace Serilog
         /// <summary>
         /// Set the specified exception on the current diagnostic context.
         /// <br/><br/>
-        /// This is useful when unhandled exceptions do not reach Serilog.AspNetCore's RequestLoggingMiddleware,
+        /// This is useful when unhandled exceptions do not reach <c>Serilog.AspNetCore.RequestLoggingMiddleware</c>,
         /// such as when using <a href="https://www.nuget.org/packages/Hellang.Middleware.ProblemDetails">Hellang.Middleware.ProblemDetails</a>
         /// to transform exceptions to ProblemDetails responses.
         /// </summary>
