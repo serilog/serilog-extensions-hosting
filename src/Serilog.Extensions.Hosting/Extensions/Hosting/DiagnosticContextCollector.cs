@@ -71,14 +71,7 @@ namespace Serilog.Extensions.Hosting
         /// <seealso cref="IDiagnosticContext.Set"/>
         public bool TryComplete(out IEnumerable<LogEventProperty> properties)
         {
-            lock (_propertiesLock)
-            {
-                properties = _properties?.Values;
-                _properties = null;
-                _exception = null;
-                Dispose();
-                return properties != null;
-            }
+            return TryComplete(out properties, out _);
         }
 
         /// <summary>
