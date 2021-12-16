@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\..\src\Serilog.Extensions.Hosting\Serilog.Extensions.Hosting.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-		<PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
-		<PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
-	</ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+  
+  <ItemGroup>
+  	<ProjectReference Include="..\..\src\Serilog.Extensions.Hosting\Serilog.Extensions.Hosting.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+  	<PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
+  	<PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
+  </ItemGroup>
 
 </Project>

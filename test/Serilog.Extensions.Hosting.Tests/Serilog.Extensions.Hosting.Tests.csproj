@@ -1,35 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFrameworks>net4.8;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
-		<AssemblyName>Serilog.Extensions.Hosting.Tests</AssemblyName>
-		<AssemblyOriginatorKeyFile>../../assets/Serilog.snk</AssemblyOriginatorKeyFile>
-		<SignAssembly>true</SignAssembly>
-		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-		<LangVersion>latest</LangVersion>
-	</PropertyGroup>
+  <PropertyGroup>
+	<TargetFrameworks>net4.8;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
+	<AssemblyName>Serilog.Extensions.Hosting.Tests</AssemblyName>
+	<AssemblyOriginatorKeyFile>../../assets/Serilog.snk</AssemblyOriginatorKeyFile>
+	<SignAssembly>true</SignAssembly>
+	<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+	<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+	<LangVersion>latest</LangVersion>
+  </PropertyGroup>
 
-	<PropertyGroup Condition=" '$(TargetFramework)' == 'net4.8' ">
-		<DefineConstants>$(DefineConstants);NO_RELOADABLE_LOGGER</DefineConstants>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\..\src\Serilog.Extensions.Hosting\Serilog.Extensions.Hosting.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.22" Condition=" '$(TargetFramework)' == 'netcoreapp3.1' OR '$(TargetFramework)' == 'net4.8' " />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2"  Condition=" '$(TargetFramework)' == 'net5.0' " />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0"  Condition=" '$(TargetFramework)' == 'net6.0' " />
-
-
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
-		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="xunit" Version="2.4.1" />
-	</ItemGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net4.8' ">
+    <DefineConstants>$(DefineConstants);NO_RELOADABLE_LOGGER</DefineConstants>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Serilog.Extensions.Hosting\Serilog.Extensions.Hosting.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.22" Condition=" '$(TargetFramework)' == 'netcoreapp3.1' OR '$(TargetFramework)' == 'net4.8' " />
+  	<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2"  Condition=" '$(TargetFramework)' == 'net5.0' " />
+  	<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0"  Condition=" '$(TargetFramework)' == 'net6.0' " />
+  
+  	<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+  	<PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
+  		<PrivateAssets>all</PrivateAssets>
+  		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+  	</PackageReference>
+  	<PackageReference Include="xunit" Version="2.4.1" />
+  </ItemGroup>
 
 </Project>
