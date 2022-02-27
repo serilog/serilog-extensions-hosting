@@ -40,7 +40,7 @@ namespace Serilog.Extensions.Hosting
         }
 
         /// <summary>
-        /// Set an exception to include in the Serilog request log event.
+        /// Set the exception associated with the current diagnostic context.
         /// </summary>
         /// <example>
         /// Passing an exception to the diagnostic context is useful when unhandled exceptions are handled before reaching Serilog's
@@ -69,6 +69,7 @@ namespace Serilog.Extensions.Hosting
         /// <param name="properties">The collected properties, or null if no collection is active.</param>
         /// <returns>True if properties could be collected.</returns>
         /// <seealso cref="IDiagnosticContext.Set"/>
+        [Obsolete("Replaced by TryComplete(out IEnumerable<LogEventProperty> properties, out Exception exception).")]
         public bool TryComplete(out IEnumerable<LogEventProperty> properties)
         {
             return TryComplete(out properties, out _);
