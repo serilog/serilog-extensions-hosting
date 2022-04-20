@@ -138,17 +138,17 @@ namespace Serilog
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (configureLogger == null) throw new ArgumentNullException(nameof(configureLogger));
-            
-            // This check is eager; replacing the bootstrap logger after calling this method is not supported.
-#if !NO_RELOADABLE_LOGGER
-            var reloadable = Log.Logger as ReloadableLogger;
-            var useReload = reloadable != null && !preserveStaticLogger;
-#else
-            const bool useReload = false;
-#endif
-            
+
             builder.ConfigureServices((context, collection) =>
             {
+                // This check is eager; replacing the bootstrap logger after calling this method is not supported.
+#if !NO_RELOADABLE_LOGGER
+                var reloadable = Log.Logger as ReloadableLogger;
+                var useReload = reloadable != null && !preserveStaticLogger;
+#else
+                const bool useReload = false;
+#endif
+
                 LoggerProviderCollection loggerProviders = null;
                 if (writeToProviders)
                 {
