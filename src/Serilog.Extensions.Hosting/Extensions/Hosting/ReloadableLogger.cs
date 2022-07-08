@@ -368,9 +368,13 @@ namespace Serilog.Extensions.Hosting
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         (ILogger, bool) UpdateForCaller(ILogger root, ILogger cached, IReloadableLogger caller, out ILogger newRoot, out ILogger newCached, out bool frozen)
         {
+            // Synchronization on `_sync` is not required in this method; it will be called without a lock
+            // if `_frozen` and under a lock if not.
+            
             if (_frozen)
             {
-                // If we're frozen, then the caller hasn't observed this yet and should update.
+                // If we're frozen, then the caller hasn't observed this yet and should update. We could optimize a little here
+                // and only signal an update if the cached logger is stale (as per the next condition below).
                 newRoot = _logger;
                 newCached = caller.ReloadLogger();
                 frozen = true;
@@ -384,7 +388,7 @@ namespace Serilog.Extensions.Hosting
                 frozen = false;
                 return (cached, false);
             }
-            
+        
             newRoot = _logger;
             newCached = caller.ReloadLogger();
             frozen = false;
