@@ -56,5 +56,12 @@ namespace Serilog.Extensions.Hosting
                 collector.AddOrUpdate(property);
             }
         }
+
+        /// <inheritdoc cref="IDiagnosticContext.SetException"/>
+        public void SetException(Exception exception)
+        {
+            var collector = AmbientDiagnosticContextCollector.Current;
+            collector?.SetException(exception);
+        }
     }
 }

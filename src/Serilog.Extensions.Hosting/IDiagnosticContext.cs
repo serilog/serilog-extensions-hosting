@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Serilog
 {
     /// <summary>
@@ -27,6 +29,17 @@ namespace Serilog
         /// <param name="value">The property value.</param>
         /// <param name="destructureObjects">If true, the value will be serialized as structured
         /// data if possible; if false, the object will be recorded as a scalar or simple array.</param>
-        void Set(string propertyName, object value, bool destructureObjects = false); 
+        void Set(string propertyName, object value, bool destructureObjects = false);
+
+        /// <summary>
+        /// Set the specified exception on the current diagnostic context.
+        /// </summary>
+        /// <remarks>
+        /// This method is useful when unhandled exceptions do not reach <c>Serilog.AspNetCore.RequestLoggingMiddleware</c>,
+        /// such as when using <a href="https://www.nuget.org/packages/Hellang.Middleware.ProblemDetails">Hellang.Middleware.ProblemDetails</a>
+        /// to transform exceptions to ProblemDetails responses.
+        /// </remarks>
+        /// <param name="exception">The exception to log. If <c>null</c> is given, it clears any previously assigned exception.</param>
+        void SetException(Exception exception);
     }
 }
