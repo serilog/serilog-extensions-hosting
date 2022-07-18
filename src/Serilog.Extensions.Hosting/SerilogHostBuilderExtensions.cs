@@ -84,6 +84,9 @@ namespace Serilog
                 {
                     // This won't (and shouldn't) take ownership of the logger. 
                     collection.AddSingleton(logger);
+
+                    // Still need to use RegisteredLogger as it is used by ConfigureDiagnosticContext.
+                    collection.AddSingleton(new RegisteredLogger(logger));
                 }
                 bool useRegisteredLogger = logger != null;
                 ConfigureDiagnosticContext(collection, useRegisteredLogger);
