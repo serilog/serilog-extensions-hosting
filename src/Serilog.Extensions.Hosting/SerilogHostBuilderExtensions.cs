@@ -18,6 +18,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog.Extensions.Hosting;
 using Serilog.Extensions.Logging;
+
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace Serilog
@@ -31,13 +32,13 @@ namespace Serilog
         // root logger, registering it as a singleton may lead to disposal along with the container by MEDI. This isn't
         // always desirable, i.e. we may be handed a logger and `dispose: false`, so wrapping it keeps us in control
         // of when the logger is disposed.
-        class RegisteredLogger
+        private class RegisteredLogger
         {
             public RegisteredLogger(ILogger logger)
             {
                 Logger = logger;
             }
-            
+
             public ILogger Logger { get; }
         }
 
@@ -54,43 +55,63 @@ namespace Serilog
         /// default, only Serilog sinks will receive events.</param>
         /// <returns>The host builder.</returns>
         public static IHostBuilder UseSerilog(
-            this IHostBuilder builder, 
-            ILogger logger = null, 
+            this IHostBuilder builder,
+            ILogger logger = null,
+            bool dispose = false,
+            LoggerProviderCollection providers = null)
+        {
+            return builder.ConfigureServices((context, services) =>
+                services.AddLogging(logging => logging.AddSerilog(logger, dispose, providers)));
+        }
+
+        /// <summary>
+        /// Sets Serilog as the logging provider.
+        /// </summary>
+        /// <param name="builder">The logging builder to configure.</param>
+        /// <param name="logger">The Serilog logger; if not supplied, the static <see cref="Serilog.Log"/> will be used.</param>
+        /// <param name="dispose">When <c>true</c>, dispose <paramref name="logger"/> when the framework disposes the provider. If the
+        /// logger is not specified but <paramref name="dispose"/> is <c>true</c>, the <see cref="Serilog.Log.CloseAndFlush()"/> method will be
+        /// called on the static <see cref="Serilog.Log"/> class instead.</param>
+        /// <param name="providers">A <see cref="LoggerProviderCollection"/> registered in the Serilog pipeline using the
+        /// <c>WriteTo.Providers()</c> configuration method, enabling other <see cref="Microsoft.Extensions.Logging.ILoggerProvider"/>s to receive events. By
+        /// default, only Serilog sinks will receive events.</param>
+        /// <returns>The host builder.</returns>
+        public static ILoggingBuilder AddSerilog(
+            this ILoggingBuilder builder,
+            ILogger logger = null,
             bool dispose = false,
             LoggerProviderCollection providers = null)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.ConfigureServices((_, collection) =>
+            var services = builder.Services;
+            if (providers != null)
             {
-                if (providers != null)
+                services.AddSingleton<ILoggerFactory>(services =>
                 {
-                    collection.AddSingleton<ILoggerFactory>(services =>
-                    {
-                        var factory = new SerilogLoggerFactory(logger, dispose, providers);
+                    var factory = new SerilogLoggerFactory(logger, dispose, providers);
 
-                        foreach (var provider in services.GetServices<ILoggerProvider>())
-                            factory.AddProvider(provider);
+                    foreach (var provider in services.GetServices<ILoggerProvider>())
+                        factory.AddProvider(provider);
 
-                        return factory;
-                    });
-                }
-                else
-                {
-                    collection.AddSingleton<ILoggerFactory>(services => new SerilogLoggerFactory(logger, dispose));
-                }
+                    return factory;
+                });
+            }
+            else
+            {
+                services.AddSingleton<ILoggerFactory>(services => new SerilogLoggerFactory(logger, dispose));
+            }
 
-                if (logger != null)
-                {
-                    // This won't (and shouldn't) take ownership of the logger. 
-                    collection.AddSingleton(logger);
+            if (logger != null)
+            {
+                // This won't (and shouldn't) take ownership of the logger.
+                services.AddSingleton(logger);
 
-                    // Still need to use RegisteredLogger as it is used by ConfigureDiagnosticContext.
-                    collection.AddSingleton(new RegisteredLogger(logger));
-                }
-                bool useRegisteredLogger = logger != null;
-                ConfigureDiagnosticContext(collection, useRegisteredLogger);
-            });
+                // Still need to use RegisteredLogger as it is used by ConfigureDiagnosticContext.
+                services.AddSingleton(new RegisteredLogger(logger));
+            }
+            bool useRegisteredLogger = logger != null;
+            ConfigureDiagnosticContext(services, useRegisteredLogger);
 
             return builder;
         }
@@ -147,7 +168,7 @@ namespace Serilog
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (configureLogger == null) throw new ArgumentNullException(nameof(configureLogger));
-            
+
             // This check is eager; replacing the bootstrap logger after calling this method is not supported.
 #if !NO_RELOADABLE_LOGGER
             var reloadable = Log.Logger as ReloadableLogger;
@@ -155,7 +176,7 @@ namespace Serilog
 #else
             const bool useReload = false;
 #endif
-            
+
             builder.ConfigureServices((context, collection) =>
             {
                 LoggerProviderCollection loggerProviders = null;
@@ -163,7 +184,7 @@ namespace Serilog
                 {
                     loggerProviders = new LoggerProviderCollection();
                 }
-                
+
                 collection.AddSingleton(services =>
                 {
                     ILogger logger;
@@ -174,11 +195,11 @@ namespace Serilog
                         {
                             if (loggerProviders != null)
                                 cfg.WriteTo.Providers(loggerProviders);
-                            
+
                             configureLogger(context, services, cfg);
                             return cfg;
                         });
-                        
+
                         logger = reloadable.Freeze();
                     }
                     else
@@ -203,11 +224,11 @@ namespace Serilog
                     var logger = services.GetRequiredService<RegisteredLogger>().Logger;
                     return logger.ForContext(new NullEnricher());
                 });
-                
+
                 collection.AddSingleton<ILoggerFactory>(services =>
                 {
                     var logger = services.GetRequiredService<RegisteredLogger>().Logger;
-                    
+
                     ILogger registeredLogger = null;
                     if (preserveStaticLogger)
                     {
@@ -233,15 +254,15 @@ namespace Serilog
 
                 ConfigureDiagnosticContext(collection, preserveStaticLogger);
             });
-            
+
             return builder;
         }
 
-        static void ConfigureDiagnosticContext(IServiceCollection collection, bool useRegisteredLogger)
+        private static void ConfigureDiagnosticContext(IServiceCollection collection, bool useRegisteredLogger)
         {
             if (collection == null) throw new ArgumentNullException(nameof(collection));
 
-            // Registered to provide two services...            
+            // Registered to provide two services...
             // Consumed by e.g. middleware
             collection.AddSingleton(services =>
             {
