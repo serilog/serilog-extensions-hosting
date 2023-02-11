@@ -4,7 +4,7 @@
     <Description>Serilog support for .NET Core logging in hosted services</Description>
     <VersionPrefix>5.0.1</VersionPrefix>
     <Authors>Microsoft;Serilog Contributors</Authors>
-    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net6.0;net7.0</TargetFrameworks>
     <LangVersion>8</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -15,9 +15,9 @@
     <PackageId>Serilog.Extensions.Hosting</PackageId>
     <PackageTags>serilog;aspnet;aspnetcore;hosting</PackageTags>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageProjectUrl>https://github.com/serilog/serilog-extensions-hosting</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/cnblogs/cnblogs-serilog-extensions</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/serilog/serilog-extensions-hosting</RepositoryUrl>
+    <RepositoryUrl>https://github.com/cnblogs/cnblogs-serilog-extensions</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <RootNamespace>Serilog</RootNamespace>
@@ -28,15 +28,27 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Serilog" Version="2.10.0" />
+    <PackageReference Include="Serilog" Version="2.12.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.8" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.8" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.8" />
   </ItemGroup>
+
+  <Choose>
+    <When Condition="'$(TargetFramework)' == 'net6.0' Or '$(TargetFramework)' == 'net7.0'">
+      <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
 
   <ItemGroup>
     <None Include="..\..\assets\icon.png" Pack="true" Visible="false" PackagePath="" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 </Project>

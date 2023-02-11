@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
@@ -9,9 +9,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="serilog.settings.configuration" Version="3.1.0" />
-      <PackageReference Include="serilog.sinks.console" Version="3.1.1" />
-      <PackageReference Include="serilog.sinks.file" Version="4.1.0" />
+      <PackageReference Include="serilog.settings.configuration" Version="3.4.0" />
+      <PackageReference Include="serilog.sinks.console" Version="4.1.0" />
+      <PackageReference Include="serilog.sinks.file" Version="5.0.0" />
     </ItemGroup>
 
 </Project>
