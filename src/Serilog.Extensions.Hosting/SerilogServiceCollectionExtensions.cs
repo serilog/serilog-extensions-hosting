@@ -23,7 +23,7 @@ using Serilog.Extensions.Logging;
 namespace Serilog
 {
     /// <summary>
-    /// Extends <see cref="IHostBuilder"/> with Serilog configuration methods.
+    /// Extends <see cref="IServiceCollection"/> with Serilog configuration methods.
     /// </summary>
     public static class SerilogServiceCollectionExtensions
     {
