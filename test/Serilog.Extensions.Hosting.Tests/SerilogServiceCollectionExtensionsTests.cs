@@ -33,7 +33,7 @@ namespace Serilog.Extensions.Hosting.Tests
             collection.AddSerilog(logger);
 
             // Assert
-            IServiceProvider provider = collection.BuildServiceProvider();
+            using var provider = collection.BuildServiceProvider();
             provider.GetRequiredService<ILogger>();
             provider.GetRequiredService<ILoggerFactory>();
             provider.GetRequiredService<IDiagnosticContext>();
