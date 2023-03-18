@@ -17,7 +17,7 @@ namespace Serilog.Extensions.Hosting.Tests
             collection.AddSerilog();
 
             // Assert
-            IServiceProvider provider = collection.BuildServiceProvider();
+            using var provider = collection.BuildServiceProvider();
             provider.GetRequiredService<ILoggerFactory>();
             provider.GetRequiredService<IDiagnosticContext>();
         }
@@ -49,7 +49,7 @@ namespace Serilog.Extensions.Hosting.Tests
             collection.AddSerilog(_ => { });
 
             // Assert
-            IServiceProvider provider = collection.BuildServiceProvider();
+            using var provider = collection.BuildServiceProvider();
             provider.GetRequiredService<ILogger>();
             provider.GetRequiredService<ILoggerFactory>();
             provider.GetRequiredService<IDiagnosticContext>();
