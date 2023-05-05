@@ -26,8 +26,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleServiceSample", "samp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplicationSample", "samples\WebApplicationSample\WebApplicationSample.csproj", "{1ACDCA67-F404-45AB-9348-98E55E03CB8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serilog.Extensions.Logging", "..\serilog-extensions-logging\src\Serilog.Extensions.Logging\Serilog.Extensions.Logging.csproj", "{4369EFC6-EE7F-4CA1-B8C7-123C39B88708}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,10 +48,6 @@ Global
 		{1ACDCA67-F404-45AB-9348-98E55E03CB8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1ACDCA67-F404-45AB-9348-98E55E03CB8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1ACDCA67-F404-45AB-9348-98E55E03CB8C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4369EFC6-EE7F-4CA1-B8C7-123C39B88708}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4369EFC6-EE7F-4CA1-B8C7-123C39B88708}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4369EFC6-EE7F-4CA1-B8C7-123C39B88708}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4369EFC6-EE7F-4CA1-B8C7-123C39B88708}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -63,7 +57,6 @@ Global
 		{AD51759B-CD58-473F-9620-0B0E56A123A1} = {E30F638E-BBBE-4AD1-93CE-48CC69CFEFE1}
 		{E5A82756-4619-4E6B-8B26-6D83E00E99F0} = {F2407211-6043-439C-8E06-3641634332E7}
 		{1ACDCA67-F404-45AB-9348-98E55E03CB8C} = {F2407211-6043-439C-8E06-3641634332E7}
-		{4369EFC6-EE7F-4CA1-B8C7-123C39B88708} = {A1893BD1-333D-4DFE-A0F0-DDBB2FE526E0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {811E61C5-3871-4633-AFAE-B35B619C8A10}
