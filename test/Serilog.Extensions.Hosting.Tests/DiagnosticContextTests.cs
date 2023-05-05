@@ -35,15 +35,16 @@ namespace Serilog.Extensions.Hosting.Tests
             await Task.Delay(TimeSpan.FromMilliseconds(10));
             dc.Set(Some.String("second"), Some.Int32());
 
-            Assert.True(collector.TryComplete(out var properties));
+            Assert.True(collector.TryComplete(out var properties, out var exception));
             Assert.Equal(2, properties.Count());
+            Assert.Null(exception);
 
-            Assert.False(collector.TryComplete(out _));
+            Assert.False(collector.TryComplete(out _, out _));
 
             collector.Dispose();
 
             dc.Set(Some.String("third"), Some.Int32());
-            Assert.False(collector.TryComplete(out _));
+            Assert.False(collector.TryComplete(out _, out _));
         }
 
         [Fact]
@@ -97,10 +98,11 @@ namespace Serilog.Extensions.Hosting.Tests
             dc.Set("name", 10);
             dc.Set("name", 20);
 
-            Assert.True(collector.TryComplete(out var properties));
+            Assert.True(collector.TryComplete(out var properties, out var exception));
             var prop = Assert.Single(properties);
             var scalar = Assert.IsType<ScalarValue>(prop.Value);
             Assert.Equal(20, scalar.Value);
+            Assert.Null(exception);
         }
 
         [Fact]

@@ -9,8 +9,8 @@ Serilog logging for _Microsoft.Extensions.Hosting_. This package routes framewor
 **First**, install the _Serilog.Extensions.Hosting_ [NuGet package](https://www.nuget.org/packages/Serilog.Extensions.Hosting) into your app. You will need a way to view the log messages - _Serilog.Sinks.Console_ writes these to the console; there are [many more sinks available](https://www.nuget.org/packages?q=Tags%3A%22serilog%22) on NuGet.
 
 ```powershell
-Install-Package Serilog.Extensions.Hosting -DependencyVersion Highest
-Install-Package Serilog.Sinks.Console
+dotnet add package Serilog.Extensions.Hosting
+dotnet add package Serilog.Sinks.Console
 ```
 
 **Next**, in your application's _Program.cs_ file, configure Serilog first.  A `try`/`catch` block will ensure any configuration issues are appropriately logged:
@@ -88,3 +88,7 @@ You can alternatively configure Serilog using a delegate as shown below:
 This has the advantage of making the `hostingContext`'s `Configuration` object available for configuration of the logger, but at the expense of ignoring `Exception`s raised earlier in program startup.
 
 If this method is used, `Log.Logger` is assigned implicitly, and closed when the app is shut down.
+
+### Versioning
+
+This package tracks the versioning and target framework support of its [_Microsoft.Extensions.Hosting_](https://nuget.org/packages/Microsoft.Extensions.Hosting) dependency.
