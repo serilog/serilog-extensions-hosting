@@ -1,6 +1,9 @@
 version: '{build}'
 skip_tags: true
 image: Visual Studio 2022
+install:
+  - pwsh: ./Setup.ps1
+  - pwsh: mkdir -Force ".\build\" | Out-Null
 test: off
 build_script:
 - ps: ./Build.ps1
