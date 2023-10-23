@@ -1,6 +1,4 @@
-﻿#if !NO_RELOADABLE_LOGGER
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Serilog.Core;
 using Serilog.Events;
@@ -18,12 +16,12 @@ namespace Serilog.Extensions.Hosting.Tests
             var contextual = logger.ForContext<ReloadableLoggerTests>();
 
             var nested = contextual.ForContext("test", "test");
-            Assert.IsNotType<Core.Logger>(nested);
+            Assert.IsNotType<Logger>(nested);
 
             logger.Freeze();
 
             nested = contextual.ForContext("test", "test");
-            Assert.IsType<Core.Logger>(nested);
+            Assert.IsType<Logger>(nested);
         }
         
         [Fact]
@@ -104,5 +102,3 @@ namespace Serilog.Extensions.Hosting.Tests
         }
     }
 }
-
-#endif
