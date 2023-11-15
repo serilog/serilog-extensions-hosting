@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -38,6 +36,7 @@ namespace SimpleServiceSample
                 .ConfigureServices(services => services.AddHostedService<PrintTimeService>())
                 .UseSerilog((context, services, loggerConfiguration) => loggerConfiguration
                     .ReadFrom.Configuration(context.Configuration)
+                    .ReadFrom.Services(services)
                     .Enrich.FromLogContext()
                     .WriteTo.Console());
     }
