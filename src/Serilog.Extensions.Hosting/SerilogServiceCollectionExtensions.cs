@@ -37,7 +37,7 @@ namespace Serilog
             {
                 Logger = logger;
             }
-            
+
             public ILogger Logger { get; }
         }
 
@@ -54,8 +54,8 @@ namespace Serilog
         /// default, only Serilog sinks will receive events.</param>
         /// <returns>The service collection.</returns>
         public static IServiceCollection AddSerilog(
-            this IServiceCollection collection, 
-            ILogger logger = null, 
+            this IServiceCollection collection,
+            ILogger logger = null,
             bool dispose = false,
             LoggerProviderCollection providers = null)
         {
@@ -136,7 +136,7 @@ namespace Serilog
         {
             if (collection == null) throw new ArgumentNullException(nameof(collection));
             if (configureLogger == null) throw new ArgumentNullException(nameof(configureLogger));
-            
+
             // This check is eager; replacing the bootstrap logger after calling this method is not supported.
 #if !NO_RELOADABLE_LOGGER
             var reloadable = Log.Logger as ReloadableLogger;
@@ -144,13 +144,13 @@ namespace Serilog
 #else
             const bool useReload = false;
 #endif
-            
+
             LoggerProviderCollection loggerProviders = null;
             if (writeToProviders)
             {
                 loggerProviders = new LoggerProviderCollection();
             }
-                
+
             collection.AddSingleton(services =>
             {
                 ILogger logger;
@@ -190,11 +190,11 @@ namespace Serilog
                 var logger = services.GetRequiredService<RegisteredLogger>().Logger;
                 return logger.ForContext(new NullEnricher());
             });
-                
+
             collection.AddSingleton<ILoggerFactory>(services =>
             {
                 var logger = services.GetRequiredService<RegisteredLogger>().Logger;
-                    
+
                 ILogger registeredLogger = null;
                 if (preserveStaticLogger)
                 {
@@ -219,7 +219,7 @@ namespace Serilog
             });
 
             ConfigureDiagnosticContext(collection, preserveStaticLogger);
-            
+
             return collection;
         }
 
