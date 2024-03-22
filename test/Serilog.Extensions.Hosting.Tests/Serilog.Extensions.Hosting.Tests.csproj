@@ -11,7 +11,7 @@
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net4.8' ">
     <DefineConstants>$(DefineConstants);NO_RELOADABLE_LOGGER</DefineConstants>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\Serilog.Extensions.Hosting\Serilog.Extensions.Hosting.csproj" />
   </ItemGroup>
@@ -22,5 +22,5 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" PrivateAssets="all" />
     <PackageReference Include="xunit" Version="2.6.1" />
   </ItemGroup>
-  
+
 </Project>

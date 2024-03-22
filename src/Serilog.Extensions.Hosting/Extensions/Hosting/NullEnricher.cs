@@ -15,14 +15,13 @@
 using Serilog.Core;
 using Serilog.Events;
 
-namespace Serilog.Extensions.Hosting
+namespace Serilog.Extensions.Hosting;
+
+// Does nothing, but makes it easy to create an `ILogger` from a Serilog `Logger`
+// that will not dispose the underlying pipeline when disposed itself.
+class NullEnricher : ILogEventEnricher
 {
-    // Does nothing, but makes it easy to create an `ILogger` from a Serilog `Logger`
-    // that will not dispose the underlying pipeline when disposed itself.
-    class NullEnricher : ILogEventEnricher
+    public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
-        public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
-        {
-        }
     }
 }

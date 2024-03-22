@@ -4,24 +4,23 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace SimpleServiceSample
+namespace SimpleServiceSample;
+
+public class PrintTimeService : BackgroundService
 {
-    public class PrintTimeService : BackgroundService
+    private readonly ILogger _logger;
+
+    public PrintTimeService(ILogger<PrintTimeService> logger)
     {
-        private readonly ILogger _logger;
+        _logger = logger;
+    }
 
-        public PrintTimeService(ILogger<PrintTimeService> logger)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
         {
-            _logger = logger;
-        }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                _logger.LogInformation("The current time is: {CurrentTime}", DateTimeOffset.UtcNow);
-                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
-            }
+            _logger.LogInformation("The current time is: {CurrentTime}", DateTimeOffset.UtcNow);
+            await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
         }
     }
 }
