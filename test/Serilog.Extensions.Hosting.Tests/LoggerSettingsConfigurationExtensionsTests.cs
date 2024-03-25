@@ -13,7 +13,7 @@ public class LoggerSettingsConfigurationExtensionsTests
     public void SinksAreInjectedFromTheServiceProvider()
     {
         var emittedEvents = new List<LogEvent>();
-        
+
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddSingleton<ILogEventSink>(new ListSink(emittedEvents));
         using var services = serviceCollection.BuildServiceProvider();
@@ -21,9 +21,9 @@ public class LoggerSettingsConfigurationExtensionsTests
         using var logger = new LoggerConfiguration()
             .ReadFrom.Services(services)
             .CreateLogger();
-        
+
         logger.Information("Hello, world!");
-        
+
         var evt = Assert.Single(emittedEvents);
         Assert.Equal("Hello, world!", evt!.MessageTemplate.Text);
     }

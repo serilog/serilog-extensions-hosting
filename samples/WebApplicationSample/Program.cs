@@ -12,7 +12,7 @@ public static class Program
         Log.Logger = new LoggerConfiguration()
             .WriteTo.Console()
             .CreateBootstrapLogger();
-        
+
         Log.Information("Starting up!");
 
         try
