@@ -3,56 +3,55 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Xunit;
 
-namespace Serilog.Extensions.Hosting.Tests
+namespace Serilog.Extensions.Hosting.Tests;
+
+public class SerilogServiceCollectionExtensionsTests
 {
-    public class SerilogServiceCollectionExtensionsTests
+    [Fact]
+    public void ServicesAreRegisteredWhenCallingAddSerilog()
     {
-        [Fact]
-        public void ServicesAreRegisteredWhenCallingAddSerilog()
-        {
-            // Arrange
-            var collection = new ServiceCollection();
+        // Arrange
+        var collection = new ServiceCollection();
 
-            // Act
-            collection.AddSerilog();
+        // Act
+        collection.AddSerilog();
 
-            // Assert
-            using var provider = collection.BuildServiceProvider();
-            provider.GetRequiredService<ILoggerFactory>();
-            provider.GetRequiredService<IDiagnosticContext>();
-        }
+        // Assert
+        using var provider = collection.BuildServiceProvider();
+        provider.GetRequiredService<ILoggerFactory>();
+        provider.GetRequiredService<IDiagnosticContext>();
+    }
 
-        [Fact]
-        public void ServicesAreRegisteredWhenCallingAddSerilogWithLogger()
-        {
-            // Arrange
-            var collection = new ServiceCollection();
-            ILogger logger = new LoggerConfiguration().CreateLogger();
+    [Fact]
+    public void ServicesAreRegisteredWhenCallingAddSerilogWithLogger()
+    {
+        // Arrange
+        var collection = new ServiceCollection();
+        ILogger logger = new LoggerConfiguration().CreateLogger();
 
-            // Act
-            collection.AddSerilog(logger);
+        // Act
+        collection.AddSerilog(logger);
 
-            // Assert
-            using var provider = collection.BuildServiceProvider();
-            provider.GetRequiredService<ILogger>();
-            provider.GetRequiredService<ILoggerFactory>();
-            provider.GetRequiredService<IDiagnosticContext>();
-        }
+        // Assert
+        using var provider = collection.BuildServiceProvider();
+        provider.GetRequiredService<ILogger>();
+        provider.GetRequiredService<ILoggerFactory>();
+        provider.GetRequiredService<IDiagnosticContext>();
+    }
 
-        [Fact]
-        public void ServicesAreRegisteredWhenCallingAddSerilogWithConfigureDelegate()
-        {
-            // Arrange
-            var collection = new ServiceCollection();
+    [Fact]
+    public void ServicesAreRegisteredWhenCallingAddSerilogWithConfigureDelegate()
+    {
+        // Arrange
+        var collection = new ServiceCollection();
 
-            // Act
-            collection.AddSerilog(_ => { });
+        // Act
+        collection.AddSerilog(_ => { });
 
-            // Assert
-            using var provider = collection.BuildServiceProvider();
-            provider.GetRequiredService<ILogger>();
-            provider.GetRequiredService<ILoggerFactory>();
-            provider.GetRequiredService<IDiagnosticContext>();
-        }
+        // Assert
+        using var provider = collection.BuildServiceProvider();
+        provider.GetRequiredService<ILogger>();
+        provider.GetRequiredService<ILoggerFactory>();
+        provider.GetRequiredService<IDiagnosticContext>();
     }
 }
