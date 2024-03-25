@@ -18,26 +18,25 @@ using Microsoft.Extensions.Hosting;
 using Serilog.Extensions.Hosting;
 using System;
 
-namespace Serilog
+namespace Serilog;
+
+/// <summary>
+/// Extends <see cref="LoggerConfiguration"/>.
+/// </summary>
+public static class LoggerConfigurationExtensions
 {
     /// <summary>
-    /// Extends <see cref="LoggerConfiguration"/>.
+    /// Create a <see cref="ReloadableLogger"/> for use during host bootstrapping. The
+    /// <see cref="SerilogHostBuilderExtensions.UseSerilog(IHostBuilder, Action{HostBuilderContext, IServiceProvider, LoggerConfiguration}, bool, bool)"/>
+    /// configuration overload will detect when <see cref="Log.Logger"/> is set to a <see cref="ReloadableLogger"/> instance, and
+    /// reconfigure/freeze it so that <see cref="ILogger"/>s created during host bootstrapping continue to work once
+    /// logger configuration (with access to host services) is completed.
     /// </summary>
-    public static class LoggerConfigurationExtensions
+    /// <param name="loggerConfiguration"></param>
+    /// <returns></returns>
+    public static ReloadableLogger CreateBootstrapLogger(this LoggerConfiguration loggerConfiguration)
     {
-        /// <summary>
-        /// Create a <see cref="ReloadableLogger"/> for use during host bootstrapping. The
-        /// <see cref="SerilogHostBuilderExtensions.UseSerilog(IHostBuilder, Action{HostBuilderContext, IServiceProvider, LoggerConfiguration}, bool, bool)"/>
-        /// configuration overload will detect when <see cref="Log.Logger"/> is set to a <see cref="ReloadableLogger"/> instance, and
-        /// reconfigure/freeze it so that <see cref="ILogger"/>s created during host bootstrapping continue to work once
-        /// logger configuration (with access to host services) is completed.
-        /// </summary>
-        /// <param name="loggerConfiguration"></param>
-        /// <returns></returns>
-        public static ReloadableLogger CreateBootstrapLogger(this LoggerConfiguration loggerConfiguration)
-        {
-            return new ReloadableLogger(loggerConfiguration.CreateLogger());
-        }
+        return new ReloadableLogger(loggerConfiguration.CreateLogger());
     }
 }
 

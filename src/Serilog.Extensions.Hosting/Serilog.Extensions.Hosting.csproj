@@ -8,7 +8,7 @@
     <!-- These must match the Dependencies tab in https://www.nuget.org/packages/microsoft.extensions.hosting at
          the target version. -->
     <TargetFrameworks>net462;netstandard2.0;net6.0;net7.0;net8.0</TargetFrameworks>
-    <LangVersion>8</LangVersion>
+    <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyOriginatorKeyFile>../../assets/Serilog.snk</AssemblyOriginatorKeyFile>

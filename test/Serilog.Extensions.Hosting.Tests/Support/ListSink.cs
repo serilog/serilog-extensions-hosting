@@ -5,20 +5,19 @@ using System.Collections.Generic;
 using Serilog.Core;
 using Serilog.Events;
 
-namespace Serilog.Extensions.Hosting.Tests.Support
+namespace Serilog.Extensions.Hosting.Tests.Support;
+
+public class ListSink : ILogEventSink
 {
-    public class ListSink : ILogEventSink
+    readonly List<LogEvent> _list;
+
+    public ListSink(List<LogEvent> list)
     {
-        readonly List<LogEvent> _list;
+        _list = list;
+    }
 
-        public ListSink(List<LogEvent> list)
-        {
-            _list = list;
-        }
-
-        public void Emit(LogEvent logEvent)
-        {
-            _list.Add(logEvent);
-        }
+    public void Emit(LogEvent logEvent)
+    {
+        _list.Add(logEvent);
     }
 }

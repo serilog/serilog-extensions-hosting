@@ -17,27 +17,26 @@ using Serilog.Configuration;
 using Serilog.Core;
 using Serilog.Extensions.Hosting;
 
-namespace Serilog
+namespace Serilog;
+
+/// <summary>
+/// Extends <see cref="LoggerSettingsConfiguration"/> with methods for consuming host services.
+/// </summary>
+public static class LoggerSettingsConfigurationExtensions
 {
     /// <summary>
-    /// Extends <see cref="LoggerSettingsConfiguration"/> with methods for consuming host services.
+    /// Configure the logger using components from the <paramref name="services"/>. If present, the logger will
+    /// receive implementations/instances of <see cref="LoggingLevelSwitch"/>, <see cref="IDestructuringPolicy"/>,
+    /// <see cref="ILogEventFilter"/>, <see cref="ILogEventEnricher"/>, <see cref="ILogEventSink"/>, and
+    /// <see cref="ILoggerSettings"/>.
     /// </summary>
-    public static class LoggerSettingsConfigurationExtensions
+    /// <param name="loggerSettingsConfiguration">The `ReadFrom` configuration object.</param>
+    /// <param name="services">A <see cref="IServiceProvider"/> from which services will be requested.</param>
+    /// <returns>A <see cref="LoggerConfiguration"/> to support method chaining.</returns>
+    public static LoggerConfiguration Services(
+        this LoggerSettingsConfiguration loggerSettingsConfiguration,
+        IServiceProvider services)
     {
-        /// <summary>
-        /// Configure the logger using components from the <paramref name="services"/>. If present, the logger will
-        /// receive implementations/instances of <see cref="LoggingLevelSwitch"/>, <see cref="IDestructuringPolicy"/>,
-        /// <see cref="ILogEventFilter"/>, <see cref="ILogEventEnricher"/>, <see cref="ILogEventSink"/>, and
-        /// <see cref="ILoggerSettings"/>.
-        /// </summary>
-        /// <param name="loggerSettingsConfiguration">The `ReadFrom` configuration object.</param>
-        /// <param name="services">A <see cref="IServiceProvider"/> from which services will be requested.</param>
-        /// <returns>A <see cref="LoggerConfiguration"/> to support method chaining.</returns>
-        public static LoggerConfiguration Services(
-            this LoggerSettingsConfiguration loggerSettingsConfiguration,
-            IServiceProvider services)
-        {
-            return loggerSettingsConfiguration.Settings(new InjectedLoggerSettings(services));
-        }
+        return loggerSettingsConfiguration.Settings(new InjectedLoggerSettings(services));
     }
 }
