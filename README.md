@@ -65,8 +65,6 @@ A more complete example, showing _appsettings.json_ configuration, can be found 
 
 With _Serilog.Extensions.Hosting_ installed and configured, you can write log messages directly through Serilog or any `ILogger` interface injected by .NET. All loggers will use the same underlying implementation, levels, and destinations.
 
-**Tip:** change the minimum level for `Microsoft` to `Warning` 
-
 ### Inline initialization
 
 You can alternatively configure Serilog using a delegate as shown below:
