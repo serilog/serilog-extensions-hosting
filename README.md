@@ -3,9 +3,9 @@
 Serilog logging for _Microsoft.Extensions.Hosting_. This package routes framework log messages through Serilog, so you can get information about the framework's internal operations written to the same Serilog sinks as your application events.
 
 **Versioning:** This package tracks the versioning and target framework support of its
-[_Microsoft.Extensions.Hosting_](https://nuget.org/packages/Microsoft.Extensions.Hosting) dependency. Most users should choose the version of _Serilog.AspNetCore_ that matches
-their application's target framework. I.e. if you're targeting .NET 7.x, choose a 7.x version of _Serilog.AspNetCore_. If
-you're targeting .NET 8.x, choose an 8.x _Serilog.AspNetCore_ version, and so on.
+[_Microsoft.Extensions.Hosting_](https://nuget.org/packages/Microsoft.Extensions.Hosting) dependency. Most users should choose the version of _Serilog.Extensions.Hosting_ that matches
+their application's target framework. I.e. if you're targeting .NET 7.x, choose a 7.x version of _Serilog.Extensions.Hosting_. If
+you're targeting .NET 8.x, choose an 8.x _Serilog.Extensions.Hosting_ version, and so on.
 
 ### Instructions
 
@@ -82,7 +82,3 @@ You can alternatively configure Serilog using a delegate as shown below:
 This has the advantage of making the `hostingContext`'s `Configuration` object available for configuration of the logger, but at the expense of ignoring `Exception`s raised earlier in program startup.
 
 If this method is used, `Log.Logger` is assigned implicitly, and closed when the app is shut down.
-
-### Versioning
-
-This package tracks the versioning and target framework support of its [_Microsoft.Extensions.Hosting_](https://nuget.org/packages/Microsoft.Extensions.Hosting) dependency.
