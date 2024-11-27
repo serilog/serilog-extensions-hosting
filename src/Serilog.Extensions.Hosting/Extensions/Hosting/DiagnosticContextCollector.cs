@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Serilog.Events;
+﻿using Serilog.Events;
 
 namespace Serilog.Extensions.Hosting;
 
@@ -10,9 +8,9 @@ namespace Serilog.Extensions.Hosting;
 public sealed class DiagnosticContextCollector : IDisposable
 {
     readonly IDisposable _chainedDisposable;
-    readonly object _propertiesLock = new object();
-    Exception _exception;
-    Dictionary<string, LogEventProperty> _properties = new Dictionary<string, LogEventProperty>();
+    readonly object _propertiesLock = new();
+    Exception? _exception;
+    Dictionary<string, LogEventProperty>? _properties = new();
 
     /// <summary>
     /// Construct a <see cref="DiagnosticContextCollector"/>.
@@ -70,7 +68,7 @@ public sealed class DiagnosticContextCollector : IDisposable
     /// <returns>True if properties could be collected.</returns>
     /// <seealso cref="IDiagnosticContext.Set"/>
     [Obsolete("Replaced by TryComplete(out IEnumerable<LogEventProperty> properties, out Exception exception).")]
-    public bool TryComplete(out IEnumerable<LogEventProperty> properties)
+    public bool TryComplete(out IEnumerable<LogEventProperty>? properties)
     {
         return TryComplete(out properties, out _);
     }
@@ -85,7 +83,7 @@ public sealed class DiagnosticContextCollector : IDisposable
     /// <returns>True if properties could be collected.</returns>
     /// <seealso cref="IDiagnosticContext.Set"/>
     /// <seealso cref="Serilog.IDiagnosticContext.SetException"/>
-    public bool TryComplete(out IEnumerable<LogEventProperty> properties, out Exception exception)
+    public bool TryComplete(out IEnumerable<LogEventProperty>? properties, out Exception? exception)
     {
         lock (_propertiesLock)
         {

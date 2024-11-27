@@ -12,12 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !NO_RELOADABLE_LOGGER
-
-using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using Serilog.Core;
 using Serilog.Events;
 
@@ -29,9 +25,9 @@ namespace Serilog.Extensions.Hosting;
 /// A Serilog <see cref="ILogger"/> that can be reconfigured without invalidating existing <see cref="ILogger"/>
 /// instances derived from it.
 /// </summary>
-public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
+public sealed class ReloadableLogger : LoggerBase, ILogger, IReloadableLogger, IDisposable
 {
-    readonly object _sync = new object();
+    readonly object _sync = new();
     Logger _logger;
     
     // One-way; if the value is `true` it can never again be made `false`, allowing "double-checked" reads. If
@@ -84,7 +80,11 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
             // https://github.com/dotnet/runtime/issues/20500#issuecomment-284774431
             // Publish `_logger` and `_frozen`. This is useful here because it means that once the logger is frozen - which
             // we always expect - reads don't require any synchronization/interlocked instructions.
+#if FEATURE_MBPW
             Interlocked.MemoryBarrierProcessWide();
+#else
+            Thread.MemoryBarrier();
+#endif
             
             return _logger;
         }
@@ -100,7 +100,7 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
     /// <inheritdoc />
     public ILogger ForContext(ILogEventEnricher enricher)
     {
-        if (enricher == null) return this;
+        if (enricher == null!) return this;
         
         if (_frozen)
             return _logger.ForContext(enricher);
@@ -112,7 +112,7 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
     /// <inheritdoc />
     public ILogger ForContext(IEnumerable<ILogEventEnricher> enrichers)
     {
-        if (enrichers == null) return this;
+        if (enrichers == null!) return this;
         
         if (_frozen)
             return _logger.ForContext(enrichers);
@@ -122,9 +122,9 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
     }
 
     /// <inheritdoc />
-    public ILogger ForContext(string propertyName, object value, bool destructureObjects = false)
+    public ILogger ForContext(string propertyName, object? value, bool destructureObjects = false)
     {
-        if (propertyName == null) return this;
+        if (propertyName == null!) return this;
         
         if (_frozen)
             return _logger.ForContext(propertyName, value, destructureObjects);
@@ -146,7 +146,7 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
     /// <inheritdoc />
     public ILogger ForContext(Type source)
     {
-        if (source == null) return this;
+        if (source == null!) return this;
         
         if (_frozen)
             return _logger.ForContext(source);
@@ -155,8 +155,8 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
             return new CachingReloadableLogger(this, _logger, this, p => p.ForContext(source));
     }
 
-    /// <inheritdoc />
-    public void Write(LogEvent logEvent)
+    /// <inheritdoc cref="ILogger.Write(LogEvent)" />
+    public override void Write(LogEvent logEvent)
     {
         if (_frozen)
         {
@@ -170,8 +170,8 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
 
-    /// <inheritdoc />
-    public void Write(LogEventLevel level, string messageTemplate)
+    /// <inheritdoc cref="ILogger.Write(LogEventLevel, string)" />
+    public override void Write(LogEventLevel level, string messageTemplate)
     {
         if (_frozen)
         {
@@ -185,8 +185,8 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
 
-    /// <inheritdoc />
-    public void Write<T>(LogEventLevel level, string messageTemplate, T propertyValue)
+    /// <inheritdoc cref="ILogger.Write{T}(LogEventLevel, string, T)" />
+    public override void Write<T>(LogEventLevel level, string messageTemplate, T propertyValue)
     {
         if (_frozen)
         {
@@ -200,8 +200,8 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
 
-    /// <inheritdoc />
-    public void Write<T0, T1>(LogEventLevel level, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+    /// <inheritdoc cref="ILogger.Write{T0,T1}(LogEventLevel, string, T0, T1)" />
+    public override void Write<T0, T1>(LogEventLevel level, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
     {
         if (_frozen)
         {
@@ -215,8 +215,8 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
 
-    /// <inheritdoc />
-    public void Write<T0, T1, T2>(LogEventLevel level, string messageTemplate, T0 propertyValue0, T1 propertyValue1,
+    /// <inheritdoc cref="ILogger.Write{T0,T1,T2}(LogEventLevel, string, T0, T1, T2)" />
+    public override void Write<T0, T1, T2>(LogEventLevel level, string messageTemplate, T0 propertyValue0, T1 propertyValue1,
         T2 propertyValue2)
     {
         if (_frozen)
@@ -231,8 +231,8 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
 
-    /// <inheritdoc />
-    public void Write(LogEventLevel level, string messageTemplate, params object[] propertyValues)
+    /// <inheritdoc cref="ILogger.Write(LogEventLevel, string, object[])" />
+    public override void Write(LogEventLevel level, string messageTemplate, params object?[]? propertyValues)
     {
         if (_frozen)
         {
@@ -246,8 +246,8 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
 
-    /// <inheritdoc />
-    public void Write(LogEventLevel level, Exception exception, string messageTemplate)
+    /// <inheritdoc cref="ILogger.Write(LogEventLevel, Exception, string)" />
+    public override void Write(LogEventLevel level, Exception? exception, string messageTemplate)
     {
         if (_frozen)
         {
@@ -261,8 +261,8 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
 
-    /// <inheritdoc />
-    public void Write<T>(LogEventLevel level, Exception exception, string messageTemplate, T propertyValue)
+    /// <inheritdoc cref="ILogger.Write{T}(LogEventLevel, Exception, string, T)" />
+    public override void Write<T>(LogEventLevel level, Exception? exception, string messageTemplate, T propertyValue)
     {
         if (_frozen)
         {
@@ -276,8 +276,8 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
 
-    /// <inheritdoc />
-    public void Write<T0, T1>(LogEventLevel level, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+    /// <inheritdoc cref="ILogger.Write{T0,T1}(LogEventLevel, Exception, string, T0, T1)" />
+    public override void Write<T0, T1>(LogEventLevel level, Exception? exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
     {
         if (_frozen)
         {
@@ -291,8 +291,8 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
 
-    /// <inheritdoc />
-    public void Write<T0, T1, T2>(LogEventLevel level, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1,
+    /// <inheritdoc cref="ILogger.Write{T0,T1,T2}(LogEventLevel, Exception, string, T0, T1, T2)" />
+    public override void Write<T0, T1, T2>(LogEventLevel level, Exception? exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1,
         T2 propertyValue2)
     {
         if (_frozen)
@@ -307,8 +307,8 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
 
-    /// <inheritdoc />
-    public void Write(LogEventLevel level, Exception exception, string messageTemplate, params object[] propertyValues)
+    /// <inheritdoc cref="ILogger.Write(LogEventLevel, Exception, string, object[])" />
+    public override void Write(LogEventLevel level, Exception? exception, string messageTemplate, params object?[]? propertyValues)
     {
         if (_frozen)
         {
@@ -335,10 +335,13 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
             return _logger.IsEnabled(level);
         }
     }
-    
+
     /// <inheritdoc />
-    public bool BindMessageTemplate(string messageTemplate, object[] propertyValues, out MessageTemplate parsedTemplate,
-        out IEnumerable<LogEventProperty> boundProperties)
+    public bool BindMessageTemplate(string messageTemplate, object?[]? propertyValues,
+        [NotNullWhen(true)]
+        out MessageTemplate? parsedTemplate,
+        [NotNullWhen(true)]
+        out IEnumerable<LogEventProperty>? boundProperties)
     {
         if (_frozen)
         {
@@ -352,7 +355,7 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
     }
 
     /// <inheritdoc />
-    public bool BindProperty(string propertyName, object value, bool destructureObjects, out LogEventProperty property)
+    public bool BindProperty(string? propertyName, object? value, bool destructureObjects, [NotNullWhen(true)] out LogEventProperty? property)
     {
         if (_frozen)
         {
@@ -365,8 +368,10 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
 
+    // `newRoot` is null when the second returned tuple argument is `false`, but the signature of the method doesn't currently 
+    // allow this to be expressed.
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    (ILogger, bool) UpdateForCaller(ILogger root, ILogger cached, IReloadableLogger caller, out ILogger newRoot, out ILogger newCached, out bool frozen)
+    (ILogger, bool) UpdateForCaller(ILogger root, ILogger? cached, IReloadableLogger caller, out ILogger newRoot, out ILogger? newCached, out bool frozen)
     {
         // Synchronization on `_sync` is not required in this method; it will be called without a lock
         // if `_frozen` and under a lock if not.
@@ -381,9 +386,9 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
             return (newCached, true);
         }
 
-        if (cached != null && root == _logger)
+        if (cached != null! && root == _logger)
         {
-            newRoot = default;
+            newRoot = default!;
             newCached = default;
             frozen = false;
             return (cached, false);
@@ -395,7 +400,7 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         return (newCached, true);
     }
     
-    internal bool InvokeIsEnabled(ILogger root, ILogger cached, IReloadableLogger caller, LogEventLevel level, out bool isEnabled, out ILogger newRoot, out ILogger newCached, out bool frozen)
+    internal bool InvokeIsEnabled(ILogger root, ILogger? cached, IReloadableLogger caller, LogEventLevel level, out bool isEnabled, out ILogger newRoot, out ILogger? newCached, out bool frozen)
     {
         if (_frozen)
         {
@@ -412,9 +417,9 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
     
-    internal bool InvokeBindMessageTemplate(ILogger root, ILogger cached, IReloadableLogger caller, string messageTemplate, 
-        object[] propertyValues, out MessageTemplate parsedTemplate, out IEnumerable<LogEventProperty> boundProperties,
-        out bool canBind, out ILogger newRoot, out ILogger newCached, out bool frozen)
+    internal bool InvokeBindMessageTemplate(ILogger root, ILogger? cached, IReloadableLogger caller, string messageTemplate, 
+        object?[]? propertyValues, [NotNullWhen(true)] out MessageTemplate? parsedTemplate, [NotNullWhen(true)] out IEnumerable<LogEventProperty>? boundProperties,
+        out bool canBind, out ILogger newRoot, out ILogger? newCached, out bool frozen)
     {
         if (_frozen)
         {
@@ -431,9 +436,9 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
     
-    internal bool InvokeBindProperty(ILogger root, ILogger cached, IReloadableLogger caller, string propertyName, 
-        object propertyValue, bool destructureObjects, out LogEventProperty property,
-        out bool canBind, out ILogger newRoot, out ILogger newCached, out bool frozen)
+    internal bool InvokeBindProperty(ILogger root, ILogger? cached, IReloadableLogger caller, string? propertyName, 
+        object? propertyValue, bool destructureObjects, [NotNullWhen(true)] out LogEventProperty? property,
+        out bool canBind, out ILogger newRoot, out ILogger? newCached, out bool frozen)
     {
         if (_frozen)
         {
@@ -450,7 +455,7 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
 
-    internal bool InvokeWrite(ILogger root, ILogger cached, IReloadableLogger caller, LogEvent logEvent, out ILogger newRoot, out ILogger newCached, out bool frozen)
+    internal bool InvokeWrite(ILogger root, ILogger? cached, IReloadableLogger caller, LogEvent logEvent, out ILogger newRoot, out ILogger? newCached, out bool frozen)
     {
         if (_frozen)
         {
@@ -467,8 +472,8 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
 
-    internal bool InvokeWrite(ILogger root, ILogger cached, IReloadableLogger caller, LogEventLevel level, string messageTemplate,
-        out ILogger newRoot, out ILogger newCached, out bool frozen)
+    internal bool InvokeWrite(ILogger root, ILogger? cached, IReloadableLogger caller, LogEventLevel level, string messageTemplate,
+        out ILogger newRoot, out ILogger? newCached, out bool frozen)
     {
         if (_frozen)
         {
@@ -485,9 +490,9 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
 
-    internal bool InvokeWrite<T>(ILogger root, ILogger cached, IReloadableLogger caller, LogEventLevel level, string messageTemplate,
+    internal bool InvokeWrite<T>(ILogger root, ILogger? cached, IReloadableLogger caller, LogEventLevel level, string messageTemplate,
         T propertyValue,
-        out ILogger newRoot, out ILogger newCached, out bool frozen)
+        out ILogger newRoot, out ILogger? newCached, out bool frozen)
     {
         if (_frozen)
         {
@@ -504,9 +509,9 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
     
-    internal bool InvokeWrite<T0, T1>(ILogger root, ILogger cached, IReloadableLogger caller, LogEventLevel level, string messageTemplate,
+    internal bool InvokeWrite<T0, T1>(ILogger root, ILogger? cached, IReloadableLogger caller, LogEventLevel level, string messageTemplate,
         T0 propertyValue0, T1 propertyValue1,
-        out ILogger newRoot, out ILogger newCached, out bool frozen)
+        out ILogger newRoot, out ILogger? newCached, out bool frozen)
     {
         if (_frozen)
         {
@@ -523,9 +528,9 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
     
-    internal bool InvokeWrite<T0, T1, T2>(ILogger root, ILogger cached, IReloadableLogger caller, LogEventLevel level, string messageTemplate,
+    internal bool InvokeWrite<T0, T1, T2>(ILogger root, ILogger? cached, IReloadableLogger caller, LogEventLevel level, string messageTemplate,
         T0 propertyValue0, T1 propertyValue1, T2 propertyValue2,
-        out ILogger newRoot, out ILogger newCached, out bool frozen)
+        out ILogger newRoot, out ILogger? newCached, out bool frozen)
     {
         if (_frozen)
         {
@@ -542,9 +547,9 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
 
-    internal bool InvokeWrite(ILogger root, ILogger cached, IReloadableLogger caller, LogEventLevel level, string messageTemplate,
-        object[] propertyValues,
-        out ILogger newRoot, out ILogger newCached, out bool frozen)
+    internal bool InvokeWrite(ILogger root, ILogger? cached, IReloadableLogger caller, LogEventLevel level, string messageTemplate,
+        object?[]? propertyValues,
+        out ILogger newRoot, out ILogger? newCached, out bool frozen)
     {
         if (_frozen)
         {
@@ -561,8 +566,8 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
     
-    internal bool InvokeWrite(ILogger root, ILogger cached, IReloadableLogger caller, LogEventLevel level, Exception exception, string messageTemplate,
-        out ILogger newRoot, out ILogger newCached, out bool frozen)
+    internal bool InvokeWrite(ILogger root, ILogger? cached, IReloadableLogger caller, LogEventLevel level, Exception? exception, string messageTemplate,
+        out ILogger newRoot, out ILogger? newCached, out bool frozen)
     {
         if (_frozen)
         {
@@ -579,9 +584,9 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
 
-    internal bool InvokeWrite<T>(ILogger root, ILogger cached, IReloadableLogger caller, LogEventLevel level, Exception exception, string messageTemplate,
+    internal bool InvokeWrite<T>(ILogger root, ILogger? cached, IReloadableLogger caller, LogEventLevel level, Exception? exception, string messageTemplate,
         T propertyValue,
-        out ILogger newRoot, out ILogger newCached, out bool frozen)
+        out ILogger newRoot, out ILogger? newCached, out bool frozen)
     {
         if (_frozen)
         {
@@ -598,9 +603,9 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
     
-    internal bool InvokeWrite<T0, T1>(ILogger root, ILogger cached, IReloadableLogger caller, LogEventLevel level, Exception exception, string messageTemplate,
+    internal bool InvokeWrite<T0, T1>(ILogger root, ILogger? cached, IReloadableLogger caller, LogEventLevel level, Exception? exception, string messageTemplate,
         T0 propertyValue0, T1 propertyValue1,
-        out ILogger newRoot, out ILogger newCached, out bool frozen)
+        out ILogger newRoot, out ILogger? newCached, out bool frozen)
     {
         if (_frozen)
         {
@@ -617,9 +622,9 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
     
-    internal bool InvokeWrite<T0, T1, T2>(ILogger root, ILogger cached, IReloadableLogger caller, LogEventLevel level, Exception exception, string messageTemplate,
+    internal bool InvokeWrite<T0, T1, T2>(ILogger root, ILogger? cached, IReloadableLogger caller, LogEventLevel level, Exception? exception, string messageTemplate,
         T0 propertyValue0, T1 propertyValue1, T2 propertyValue2,
-        out ILogger newRoot, out ILogger newCached, out bool frozen)
+        out ILogger newRoot, out ILogger? newCached, out bool frozen)
     {
         if (_frozen)
         {
@@ -636,9 +641,9 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         }
     }
 
-    internal bool InvokeWrite(ILogger root, ILogger cached, IReloadableLogger caller, LogEventLevel level, Exception exception, string messageTemplate,
-        object[] propertyValues,
-        out ILogger newRoot, out ILogger newCached, out bool frozen)
+    internal bool InvokeWrite(ILogger root, ILogger? cached, IReloadableLogger caller, LogEventLevel level, Exception? exception, string messageTemplate,
+        object?[]? propertyValues,
+        out ILogger newRoot, out ILogger? newCached, out bool frozen)
     {
         if (_frozen)
         {
@@ -658,11 +663,11 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
     internal bool CreateChild(
         ILogger root, 
         IReloadableLogger parent, 
-        ILogger cachedParent,
+        ILogger? cachedParent,
         Func<ILogger, ILogger> configureChild,
         out ILogger child,
         out ILogger newRoot,
-        out ILogger newCached,
+        out ILogger? newCached,
         out bool frozen)
     {
         if (_frozen)
@@ -675,11 +680,9 @@ public sealed class ReloadableLogger : ILogger, IReloadableLogger, IDisposable
         // No synchronization, here - a lot of loggers are created and thrown away again without ever being used,
         // so we just return a lazy wrapper.
         child = new CachingReloadableLogger(this, root, parent, configureChild);
-        newRoot = default;
+        newRoot = default!;
         newCached = default;
         frozen = default;
         return false;
     }
 }
-
-#endif

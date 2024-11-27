@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog.Extensions.Hosting;
 using Serilog.Extensions.Logging;
@@ -55,9 +53,9 @@ public static class SerilogServiceCollectionExtensions
     /// <returns>The service collection.</returns>
     public static IServiceCollection AddSerilog(
         this IServiceCollection collection,
-        ILogger logger = null,
+        ILogger? logger = null,
         bool dispose = false,
-        LoggerProviderCollection providers = null)
+        LoggerProviderCollection? providers = null)
     {
         if (collection == null) throw new ArgumentNullException(nameof(collection));
 
@@ -75,7 +73,7 @@ public static class SerilogServiceCollectionExtensions
         }
         else
         {
-            collection.AddSingleton<ILoggerFactory>(services => new SerilogLoggerFactory(logger, dispose));
+            collection.AddSingleton<ILoggerFactory>(_ => new SerilogLoggerFactory(logger, dispose));
         }
 
         if (logger != null)
@@ -110,7 +108,7 @@ public static class SerilogServiceCollectionExtensions
         if (configureLogger == null) throw new ArgumentNullException(nameof(configureLogger));
         return AddSerilog(
             collection,
-            (services, loggerConfiguration) =>
+            (_, loggerConfiguration) =>
                 configureLogger(loggerConfiguration),
             preserveStaticLogger: preserveStaticLogger,
             writeToProviders: writeToProviders);
@@ -138,14 +136,10 @@ public static class SerilogServiceCollectionExtensions
         if (configureLogger == null) throw new ArgumentNullException(nameof(configureLogger));
 
         // This check is eager; replacing the bootstrap logger after calling this method is not supported.
-#if !NO_RELOADABLE_LOGGER
         var reloadable = Log.Logger as ReloadableLogger;
         var useReload = reloadable != null && !preserveStaticLogger;
-#else
-        const bool useReload = false;
-#endif
 
-        LoggerProviderCollection loggerProviders = null;
+        LoggerProviderCollection? loggerProviders = null;
         if (writeToProviders)
         {
             loggerProviders = new LoggerProviderCollection();
@@ -154,7 +148,6 @@ public static class SerilogServiceCollectionExtensions
         collection.AddSingleton(services =>
         {
             ILogger logger;
-#if !NO_RELOADABLE_LOGGER
             if (useReload)
             {
                 reloadable!.Reload(cfg =>
@@ -169,7 +162,6 @@ public static class SerilogServiceCollectionExtensions
                 logger = reloadable.Freeze();
             }
             else
-#endif
             {
                 var loggerConfiguration = new LoggerConfiguration();
 
@@ -195,7 +187,7 @@ public static class SerilogServiceCollectionExtensions
         {
             var logger = services.GetRequiredService<RegisteredLogger>().Logger;
 
-            ILogger registeredLogger = null;
+            ILogger? registeredLogger = null;
             if (preserveStaticLogger)
             {
                 registeredLogger = logger;
@@ -231,7 +223,7 @@ public static class SerilogServiceCollectionExtensions
         // Consumed by e.g. middleware
         collection.AddSingleton(services =>
         {
-            ILogger logger = useRegisteredLogger ? services.GetRequiredService<RegisteredLogger>().Logger : null;
+            ILogger? logger = useRegisteredLogger ? services.GetRequiredService<RegisteredLogger>().Logger : null;
             return new DiagnosticContext(logger);
         });
         // Consumed by user code

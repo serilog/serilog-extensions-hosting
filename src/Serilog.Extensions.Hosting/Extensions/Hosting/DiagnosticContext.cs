@@ -23,13 +23,13 @@ namespace Serilog.Extensions.Hosting;
 /// <remarks>Consumers should use <see cref="IDiagnosticContext"/> to set context properties.</remarks>
 public sealed class DiagnosticContext : IDiagnosticContext
 {
-    readonly ILogger _logger;
+    readonly ILogger? _logger;
 
     /// <summary>
     /// Construct a <see cref="DiagnosticContext"/>.
     /// </summary>
     /// <param name="logger">A logger for binding properties in the context, or <c>null</c> to use <see cref="Log.Logger"/>.</param>
-    public DiagnosticContext(ILogger logger)
+    public DiagnosticContext(ILogger? logger)
     {
         _logger = logger;
     }

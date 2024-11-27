@@ -286,3 +286,6 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 /samples/WebApplicationSample/logs/
+
+.DS_Store
+

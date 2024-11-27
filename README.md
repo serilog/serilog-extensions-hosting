@@ -2,7 +2,10 @@
 
 Serilog logging for _Microsoft.Extensions.Hosting_. This package routes framework log messages through Serilog, so you can get information about the framework's internal operations written to the same Serilog sinks as your application events.
 
-**ASP.NET Core** applications should consider [using _Serilog.AspNetCore_ instead](https://github.com/serilog/serilog-aspnetcore), which bundles this package and includes other ASP.NET Core-specific features.
+**Versioning:** This package tracks the versioning and target framework support of its
+[_Microsoft.Extensions.Hosting_](https://nuget.org/packages/Microsoft.Extensions.Hosting) dependency. Most users should choose the version of _Serilog.Extensions.Hosting_ that matches
+their application's target framework. I.e. if you're targeting .NET 7.x, choose a 7.x version of _Serilog.Extensions.Hosting_. If
+you're targeting .NET 8.x, choose an 8.x _Serilog.Extensions.Hosting_ version, and so on.
 
 ### Instructions
 
@@ -13,46 +16,37 @@ dotnet add package Serilog.Extensions.Hosting
 dotnet add package Serilog.Sinks.Console
 ```
 
-**Next**, in your application's _Program.cs_ file, configure Serilog first.  A `try`/`catch` block will ensure any configuration issues are appropriately logged:
+**Next**, in your application's _Program.cs_ file, configure Serilog first.  A `try`/`catch` block will ensure any configuration issues are appropriately logged. Call `AddSerilog()` on the host application builder:
 
 ```csharp
-public class Program
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .CreateLogger();
+
+try
 {
-    public static int Main(string[] args)
-    {
-        Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-            .Enrich.FromLogContext()
-            .WriteTo.Console()
-            .CreateLogger();
+    Log.Information("Starting host");
 
-        try
-        {
-            Log.Information("Starting host");
-            BuildHost(args).Run();
-            return 0;
-        }
-        catch (Exception ex)
-        {
-            Log.Fatal(ex, "Host terminated unexpectedly");
-            return 1;
-        }
-        finally
-        {
-            Log.CloseAndFlush();
-        }
-    }
-```
+    var builder = Host.CreateApplicationBuilder(args);
+    builder.Services.AddHostedService<PrintTimeService>();
+    builder.Services.AddSerilog();
 
-**Then**, add `UseSerilog()` to the host builder in `BuildHost()`.
-
-```csharp    
-    public static IHost BuildHost(string[] args) =>
-        new HostBuilder()
-            .ConfigureServices(services => services.AddSingleton<IHostedService, PrintTimeService>())
-            .UseSerilog() // <- Add this line
-            .Build();
+    var app = builder.Build();
+    
+    await app.RunAsync();
+    return 0;
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Host terminated unexpectedly");
+    return 1;
+}
+finally
+{
+    await Log.CloseAndFlushAsync();
 }
 ```
 
@@ -71,24 +65,18 @@ A more complete example, showing _appsettings.json_ configuration, can be found 
 
 With _Serilog.Extensions.Hosting_ installed and configured, you can write log messages directly through Serilog or any `ILogger` interface injected by .NET. All loggers will use the same underlying implementation, levels, and destinations.
 
-**Tip:** change the minimum level for `Microsoft` to `Warning` 
-
 ### Inline initialization
 
 You can alternatively configure Serilog using a delegate as shown below:
 
 ```csharp
     // dotnet add package Serilog.Settings.Configuration
-    .UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration
-        .ReadFrom.Configuration(hostingContext.Configuration)
-        .Enrich.FromLogContext()
-        .WriteTo.Console())
+builder.Services.AddSerilog((services, loggerConfiguration) => loggerConfiguration
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .WriteTo.Console())
 ```
 
-This has the advantage of making the `hostingContext`'s `Configuration` object available for configuration of the logger, but at the expense of ignoring `Exception`s raised earlier in program startup.
+This has the advantage of making `builder`'s `Configuration` object available for configuration of the logger, but at the expense of ignoring `Exception`s raised earlier in program startup.
 
 If this method is used, `Log.Logger` is assigned implicitly, and closed when the app is shut down.
-
-### Versioning
-
-This package tracks the versioning and target framework support of its [_Microsoft.Extensions.Hosting_](https://nuget.org/packages/Microsoft.Extensions.Hosting) dependency.

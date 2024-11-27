@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Serilog.Events;
+﻿using Serilog.Events;
 using Serilog.Extensions.Hosting.Tests.Support;
 using Xunit;
 
@@ -36,7 +33,7 @@ public class DiagnosticContextTests
         dc.Set(Some.String("second"), Some.Int32());
 
         Assert.True(collector.TryComplete(out var properties, out var exception));
-        Assert.Equal(2, properties.Count());
+        Assert.Equal(2, properties!.Count());
         Assert.Null(exception);
 
         Assert.False(collector.TryComplete(out _, out _));
@@ -99,7 +96,7 @@ public class DiagnosticContextTests
         dc.Set("name", 20);
 
         Assert.True(collector.TryComplete(out var properties, out var exception));
-        var prop = Assert.Single(properties);
+        var prop = Assert.Single(properties!);
         var scalar = Assert.IsType<ScalarValue>(prop.Value);
         Assert.Equal(20, scalar.Value);
         Assert.Null(exception);
@@ -115,6 +112,6 @@ public class DiagnosticContextTests
         dc.SetException(new Exception("ex2"));
 
         Assert.True(collector.TryComplete(out _, out var collectedException));
-        Assert.Equal("ex2", collectedException.Message);
+        Assert.Equal("ex2", collectedException!.Message);
     }
 }

@@ -1,8 +1,4 @@
-﻿#if !NO_RELOADABLE_LOGGER
-
-using System.Collections.Generic;
-using System.Linq;
-using Serilog.Core;
+﻿using Serilog.Core;
 using Serilog.Events;
 using Serilog.Extensions.Hosting.Tests.Support;
 using Xunit;
@@ -103,5 +99,3 @@ public class ReloadableLoggerTests
         Assert.All(emittedEvents, e => Assert.Equal(2, e.Properties.Count));
     }
 }
-
-#endif

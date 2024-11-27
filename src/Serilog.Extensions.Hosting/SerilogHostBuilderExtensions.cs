@@ -39,9 +39,9 @@ public static class SerilogHostBuilderExtensions
     /// <returns>The host builder.</returns>
     public static IHostBuilder UseSerilog(
         this IHostBuilder builder,
-        ILogger logger = null,
+        ILogger? logger = null,
         bool dispose = false,
-        LoggerProviderCollection providers = null)
+        LoggerProviderCollection? providers = null)
     {
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
