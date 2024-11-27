@@ -12,7 +12,7 @@ static class Some
 
     public static int Int32() => Interlocked.Increment(ref _next);
 
-    public static string String(string tag = null) => $"s_{tag}{Int32()}";
+    public static string String(string? tag = null) => $"s_{tag}{Int32()}";
 
     public static LogEventProperty LogEventProperty() => new LogEventProperty(String("name"), new ScalarValue(Int32()));
 

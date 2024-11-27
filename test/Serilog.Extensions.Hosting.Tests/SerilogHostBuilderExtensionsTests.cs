@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -61,9 +59,9 @@ public class SerilogHostBuilderExtensionsTests
         provider.GetRequiredService<IDiagnosticContext>();
     }
 
-    private class FakeHostBuilder : IHostBuilder
+    class FakeHostBuilder : IHostBuilder
     {
-        private readonly IServiceCollection _collection;
+        readonly IServiceCollection _collection;
 
         public FakeHostBuilder(IServiceCollection collection) => _collection = collection;
 
@@ -79,16 +77,18 @@ public class SerilogHostBuilderExtensionsTests
 
         public IHostBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configureDelegate)
         {
-            configureDelegate(null, _collection);
+            configureDelegate(null!, _collection);
             return this;
         }
 
         public IHostBuilder UseServiceProviderFactory<TContainerBuilder>(IServiceProviderFactory<TContainerBuilder> factory)
+        where TContainerBuilder: notnull
         {
             throw new NotImplementedException();
         }
 
         public IHostBuilder UseServiceProviderFactory<TContainerBuilder>(Func<HostBuilderContext, IServiceProviderFactory<TContainerBuilder>> factory)
+            where TContainerBuilder: notnull
         {
             throw new NotImplementedException();
         }
@@ -103,6 +103,6 @@ public class SerilogHostBuilderExtensionsTests
             throw new NotImplementedException();
         }
 
-        public IDictionary<object, object> Properties { get; }
+        public IDictionary<object, object> Properties { get; } = new Dictionary<object, object>();
     }
 }

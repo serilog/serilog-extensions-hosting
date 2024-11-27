@@ -12,23 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !NO_RELOADABLE_LOGGER
-
-using System;
-using System.Collections.Generic;
-using System.Threading;
+using System.Diagnostics.CodeAnalysis;
 using Serilog.Core;
 using Serilog.Events;
 
 namespace Serilog.Extensions.Hosting;
 
-class CachingReloadableLogger : ILogger, IReloadableLogger
+class CachingReloadableLogger : LoggerBase, ILogger, IReloadableLogger
 {
     readonly ReloadableLogger _reloadableLogger;
     readonly Func<ILogger, ILogger> _configure;
     readonly IReloadableLogger _parent;
-    
-    ILogger _root, _cached;
+
+    ILogger _root;
+    ILogger? _cached;
     bool _frozen;
 
     public CachingReloadableLogger(ReloadableLogger reloadableLogger, ILogger root, IReloadableLogger parent, Func<ILogger, ILogger> configure)
@@ -48,10 +45,10 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
 
     public ILogger ForContext(ILogEventEnricher enricher)
     {
-        if (enricher == null) return this;
+        if (enricher == null!) return this;
         
         if (_frozen)
-            return _cached.ForContext(enricher);
+            return _cached!.ForContext(enricher);
 
         if (_reloadableLogger.CreateChild(
             _root,
@@ -71,10 +68,10 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
 
     public ILogger ForContext(IEnumerable<ILogEventEnricher> enrichers)
     {
-        if (enrichers == null) return this;
+        if (enrichers == null!) return this;
         
         if (_frozen)
-            return _cached.ForContext(enrichers);
+            return _cached!.ForContext(enrichers);
 
         if (_reloadableLogger.CreateChild(
             _root,
@@ -92,12 +89,12 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
         return child;
     }
 
-    public ILogger ForContext(string propertyName, object value, bool destructureObjects = false)
+    public ILogger ForContext(string propertyName, object? value, bool destructureObjects = false)
     {
-        if (propertyName == null) return this;
+        if (propertyName == null!) return this;
         
         if (_frozen)
-            return _cached.ForContext(propertyName, value, destructureObjects);
+            return _cached!.ForContext(propertyName, value, destructureObjects);
 
         ILogger child;
         if (value == null || value is string || value.GetType().IsPrimitive || value.GetType().IsEnum)
@@ -147,7 +144,7 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
     public ILogger ForContext<TSource>()
     {
         if (_frozen)
-            return _cached.ForContext<TSource>();
+            return _cached!.ForContext<TSource>();
         
         if (_reloadableLogger.CreateChild(
             _root,
@@ -168,7 +165,7 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
     public ILogger ForContext(Type source)
     {
         if (_frozen)
-            return _cached.ForContext(source);
+            return _cached!.ForContext(source);
 
         if (_reloadableLogger.CreateChild(
             _root,
@@ -186,7 +183,7 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
         return child;
     }
 
-    void Update(ILogger newRoot, ILogger newCached, bool frozen)
+    void Update(ILogger newRoot, ILogger? newCached, bool frozen)
     {
         _root = newRoot;
         _cached = newCached;
@@ -194,18 +191,25 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
         // https://github.com/dotnet/runtime/issues/20500#issuecomment-284774431
         // Publish `_cached` and then `_frozen`. This is useful here because it means that once the logger is frozen - which
         // we always expect - reads don't require any synchronization/interlocked instructions.
+#if FEATURE_MBPW
         Interlocked.MemoryBarrierProcessWide();
-
+#else
+        Thread.MemoryBarrier();
+#endif
         _frozen = frozen;
 
+#if FEATURE_MBPW
         Interlocked.MemoryBarrierProcessWide();
+#else
+        Thread.MemoryBarrier();
+#endif
     }
 
-    public void Write(LogEvent logEvent)
+    public override void Write(LogEvent logEvent)
     {
         if (_frozen)
         {
-            _cached.Write(logEvent);
+            _cached!.Write(logEvent);
             return;
         }
 
@@ -222,11 +226,11 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
         }
     }
 
-    public void Write(LogEventLevel level, string messageTemplate)
+    public override void Write(LogEventLevel level, string messageTemplate)
     {
         if (_frozen)
         {
-            _cached.Write(level, messageTemplate);
+            _cached!.Write(level, messageTemplate);
             return;
         }
 
@@ -244,11 +248,11 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
         }
     }
 
-    public void Write<T>(LogEventLevel level, string messageTemplate, T propertyValue)
+    public override void Write<T>(LogEventLevel level, string messageTemplate, T propertyValue)
     {
         if (_frozen)
         {
-            _cached.Write(level, messageTemplate, propertyValue);
+            _cached!.Write(level, messageTemplate, propertyValue);
             return;
         }
 
@@ -267,11 +271,11 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
         }
     }
 
-    public void Write<T0, T1>(LogEventLevel level, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+    public override void Write<T0, T1>(LogEventLevel level, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
     {
         if (_frozen)
         {
-            _cached.Write(level, messageTemplate, propertyValue0, propertyValue1);
+            _cached!.Write(level, messageTemplate, propertyValue0, propertyValue1);
             return;
         }
 
@@ -291,12 +295,12 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
         }
     }
 
-    public void Write<T0, T1, T2>(LogEventLevel level, string messageTemplate, T0 propertyValue0, T1 propertyValue1,
+    public override void Write<T0, T1, T2>(LogEventLevel level, string messageTemplate, T0 propertyValue0, T1 propertyValue1,
         T2 propertyValue2)
     {
         if (_frozen)
         {
-            _cached.Write(level, messageTemplate, propertyValue0, propertyValue1, propertyValue2);
+            _cached!.Write(level, messageTemplate, propertyValue0, propertyValue1, propertyValue2);
             return;
         }
 
@@ -317,11 +321,11 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
         }
     }
 
-    public void Write(LogEventLevel level, string messageTemplate, params object[] propertyValues)
+    public override void Write(LogEventLevel level, string messageTemplate, params object?[]? propertyValues)
     {
         if (_frozen)
         {
-            _cached.Write(level, messageTemplate, propertyValues);
+            _cached!.Write(level, messageTemplate, propertyValues);
             return;
         }
 
@@ -340,11 +344,11 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
         }
     }
 
-    public void Write(LogEventLevel level, Exception exception, string messageTemplate)
+    public override void Write(LogEventLevel level, Exception? exception, string messageTemplate)
     {
         if (_frozen)
         {
-            _cached.Write(level, exception, messageTemplate);
+            _cached!.Write(level, exception, messageTemplate);
             return;
         }
 
@@ -363,11 +367,11 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
         }
     }
 
-    public void Write<T>(LogEventLevel level, Exception exception, string messageTemplate, T propertyValue)
+    public override void Write<T>(LogEventLevel level, Exception? exception, string messageTemplate, T propertyValue)
     {
         if (_frozen)
         {
-            _cached.Write(level, exception, messageTemplate, propertyValue);
+            _cached!.Write(level, exception, messageTemplate, propertyValue);
             return;
         }
 
@@ -387,12 +391,12 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
         }
     }
 
-    public void Write<T0, T1>(LogEventLevel level, Exception exception, string messageTemplate, T0 propertyValue0,
+    public override void Write<T0, T1>(LogEventLevel level, Exception? exception, string messageTemplate, T0 propertyValue0,
         T1 propertyValue1)
     {
         if (_frozen)
         {
-            _cached.Write(level, exception, messageTemplate, propertyValue0, propertyValue1);
+            _cached!.Write(level, exception, messageTemplate, propertyValue0, propertyValue1);
             return;
         }
 
@@ -413,12 +417,12 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
         }
     }
 
-    public void Write<T0, T1, T2>(LogEventLevel level, Exception exception, string messageTemplate, T0 propertyValue0,
+    public override void Write<T0, T1, T2>(LogEventLevel level, Exception? exception, string messageTemplate, T0 propertyValue0,
         T1 propertyValue1, T2 propertyValue2)
     {
         if (_frozen)
         {
-            _cached.Write(level, exception, messageTemplate, propertyValue0, propertyValue1, propertyValue2);
+            _cached!.Write(level, exception, messageTemplate, propertyValue0, propertyValue1, propertyValue2);
             return;
         }
 
@@ -440,11 +444,11 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
         }
     }
 
-    public void Write(LogEventLevel level, Exception exception, string messageTemplate, params object[] propertyValues)
+    public override void Write(LogEventLevel level, Exception? exception, string messageTemplate, params object?[]? propertyValues)
     {
         if (_frozen)
         {
-            _cached.Write(level, exception, messageTemplate, propertyValues);
+            _cached!.Write(level, exception, messageTemplate, propertyValues);
             return;
         }
 
@@ -468,7 +472,7 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
     {
         if (_frozen)
         {
-            return _cached.IsEnabled(level);
+            return _cached!.IsEnabled(level);
         }
 
         if (_reloadableLogger.InvokeIsEnabled(
@@ -487,12 +491,15 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
         return isEnabled;
     }
     
-    public bool BindMessageTemplate(string messageTemplate, object[] propertyValues, out MessageTemplate parsedTemplate,
-        out IEnumerable<LogEventProperty> boundProperties)
+    public bool BindMessageTemplate(string messageTemplate, object?[]? propertyValues,
+        [NotNullWhen(true)]
+        out MessageTemplate? parsedTemplate,
+        [NotNullWhen(true)]
+        out IEnumerable<LogEventProperty>? boundProperties)
     {
         if (_frozen)
         {
-            return _cached.BindMessageTemplate(messageTemplate, propertyValues, out parsedTemplate, out boundProperties);
+            return _cached!.BindMessageTemplate(messageTemplate, propertyValues, out parsedTemplate, out boundProperties);
         }
 
         if (_reloadableLogger.InvokeBindMessageTemplate(
@@ -514,11 +521,13 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
         return canBind;
     }
 
-    public bool BindProperty(string propertyName, object value, bool destructureObjects, out LogEventProperty property)
+    public bool BindProperty(string? propertyName, object? value, bool destructureObjects,
+        [NotNullWhen(true)]
+        out LogEventProperty? property)
     {
         if (_frozen)
         {
-            return _cached.BindProperty(propertyName, value, destructureObjects, out property);
+            return _cached!.BindProperty(propertyName, value, destructureObjects, out property);
         }
 
         if (_reloadableLogger.InvokeBindProperty(
@@ -540,5 +549,3 @@ class CachingReloadableLogger : ILogger, IReloadableLogger
         return canBind;
     }
 }
-
-#endif
