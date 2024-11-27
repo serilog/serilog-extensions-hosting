@@ -19,7 +19,7 @@ class InjectedLoggerSettings : ILoggerSettings
         var levelSwitch = _services.GetService<LoggingLevelSwitch>();
         if (levelSwitch != null)
             loggerConfiguration.MinimumLevel.ControlledBy(levelSwitch);
-        
+
         foreach (var settings in _services.GetServices<ILoggerSettings>())
             loggerConfiguration.ReadFrom.Settings(settings);
 
@@ -28,10 +28,10 @@ class InjectedLoggerSettings : ILoggerSettings
 
         foreach (var enricher in _services.GetServices<ILogEventEnricher>())
             loggerConfiguration.Enrich.With(enricher);
-        
+
         foreach (var filter in _services.GetServices<ILogEventFilter>())
             loggerConfiguration.Filter.With(filter);
-        
+
         foreach (var sink in _services.GetServices<ILogEventSink>())
             loggerConfiguration.WriteTo.Sink(sink);
     }

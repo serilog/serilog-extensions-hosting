@@ -38,8 +38,8 @@ public static class SerilogHostBuilderExtensions
     /// default, only Serilog sinks will receive events.</param>
     /// <returns>The host builder.</returns>
     public static IHostBuilder UseSerilog(
-        this IHostBuilder builder, 
-        ILogger? logger = null, 
+        this IHostBuilder builder,
+        ILogger? logger = null,
         bool dispose = false,
         LoggerProviderCollection? providers = null)
     {
@@ -105,7 +105,7 @@ public static class SerilogHostBuilderExtensions
     {
         if (builder == null) throw new ArgumentNullException(nameof(builder));
         if (configureLogger == null) throw new ArgumentNullException(nameof(configureLogger));
-        
+
         builder.ConfigureServices((context, collection) =>
         {
             collection.AddSerilog(
@@ -114,7 +114,7 @@ public static class SerilogHostBuilderExtensions
                 preserveStaticLogger: preserveStaticLogger,
                 writeToProviders: writeToProviders);
         });
-        
+
         return builder;
     }
 }

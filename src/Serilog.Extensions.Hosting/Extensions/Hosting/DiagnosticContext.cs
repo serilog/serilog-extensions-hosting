@@ -50,7 +50,7 @@ public sealed class DiagnosticContext : IDiagnosticContext
         if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
 
         var collector = AmbientDiagnosticContextCollector.Current;
-        if (collector != null && 
+        if (collector != null &&
             (_logger ?? Log.Logger).BindProperty(propertyName, value, destructureObjects, out var property))
         {
             collector.AddOrUpdate(property);

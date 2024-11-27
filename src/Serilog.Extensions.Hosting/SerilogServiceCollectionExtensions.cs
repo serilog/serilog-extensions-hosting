@@ -35,7 +35,7 @@ public static class SerilogServiceCollectionExtensions
         {
             Logger = logger;
         }
-        
+
         public ILogger Logger { get; }
     }
 
@@ -52,8 +52,8 @@ public static class SerilogServiceCollectionExtensions
     /// default, only Serilog sinks will receive events.</param>
     /// <returns>The service collection.</returns>
     public static IServiceCollection AddSerilog(
-        this IServiceCollection collection, 
-        ILogger? logger = null, 
+        this IServiceCollection collection,
+        ILogger? logger = null,
         bool dispose = false,
         LoggerProviderCollection? providers = null)
     {
@@ -134,17 +134,17 @@ public static class SerilogServiceCollectionExtensions
     {
         if (collection == null) throw new ArgumentNullException(nameof(collection));
         if (configureLogger == null) throw new ArgumentNullException(nameof(configureLogger));
-        
+
         // This check is eager; replacing the bootstrap logger after calling this method is not supported.
         var reloadable = Log.Logger as ReloadableLogger;
         var useReload = reloadable != null && !preserveStaticLogger;
-        
+
         LoggerProviderCollection? loggerProviders = null;
         if (writeToProviders)
         {
             loggerProviders = new LoggerProviderCollection();
         }
-            
+
         collection.AddSingleton(services =>
         {
             ILogger logger;
@@ -182,11 +182,11 @@ public static class SerilogServiceCollectionExtensions
             var logger = services.GetRequiredService<RegisteredLogger>().Logger;
             return logger.ForContext(new NullEnricher());
         });
-            
+
         collection.AddSingleton<ILoggerFactory>(services =>
         {
             var logger = services.GetRequiredService<RegisteredLogger>().Logger;
-                
+
             ILogger? registeredLogger = null;
             if (preserveStaticLogger)
             {
@@ -211,7 +211,7 @@ public static class SerilogServiceCollectionExtensions
         });
 
         ConfigureDiagnosticContext(collection, preserveStaticLogger);
-        
+
         return collection;
     }
 
