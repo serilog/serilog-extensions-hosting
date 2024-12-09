@@ -15,20 +15,19 @@
 using Serilog.Core;
 using Serilog.Events;
 
-namespace Serilog.Extensions.Hosting
+namespace Serilog.Extensions.Hosting;
+
+class FixedPropertyEnricher : ILogEventEnricher
 {
-    class FixedPropertyEnricher : ILogEventEnricher
+    readonly LogEventProperty _property;
+
+    public FixedPropertyEnricher(LogEventProperty property)
     {
-        readonly LogEventProperty _property;
+        _property = property;
+    }
 
-        public FixedPropertyEnricher(LogEventProperty property)
-        {
-            _property = property;
-        }
-
-        public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
-        {
-            logEvent.AddPropertyIfAbsent(_property);
-        }
+    public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
+    {
+        logEvent.AddPropertyIfAbsent(_property);
     }
 }

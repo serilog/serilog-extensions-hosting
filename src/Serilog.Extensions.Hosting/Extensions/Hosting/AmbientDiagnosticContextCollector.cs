@@ -12,35 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading;
+namespace Serilog.Extensions.Hosting;
 
-namespace Serilog.Extensions.Hosting
+class AmbientDiagnosticContextCollector : IDisposable
 {
-    class AmbientDiagnosticContextCollector : IDisposable
+    static readonly AsyncLocal<AmbientDiagnosticContextCollector?> AmbientCollector = new();
+
+    // The indirection here ensures that completing collection cleans up the collector in all
+    // execution contexts. Via @benaadams' addition to `HttpContextAccessor` :-)
+    DiagnosticContextCollector? _collector;
+
+    public static DiagnosticContextCollector? Current => AmbientCollector.Value?._collector;
+
+    public static DiagnosticContextCollector Begin()
     {
-        static readonly AsyncLocal<AmbientDiagnosticContextCollector> AmbientCollector =
-            new AsyncLocal<AmbientDiagnosticContextCollector>();
+        var value = new AmbientDiagnosticContextCollector();
+        value._collector = new DiagnosticContextCollector(value);
+        AmbientCollector.Value = value;
+        return value._collector;
+    }
 
-        // The indirection here ensures that completing collection cleans up the collector in all
-        // execution contexts. Via @benaadams' addition to `HttpContextAccessor` :-)
-        DiagnosticContextCollector _collector;
-
-        public static DiagnosticContextCollector Current => AmbientCollector.Value?._collector;
-
-        public static DiagnosticContextCollector Begin()
-        {
-            var value = new AmbientDiagnosticContextCollector();
-            value._collector = new DiagnosticContextCollector(value);
-            AmbientCollector.Value = value;
-            return value._collector;
-        }
-
-        public void Dispose()
-        {
-            _collector = null;
-            if (AmbientCollector.Value == this)
-                AmbientCollector.Value = null;
-        }
+    public void Dispose()
+    {
+        _collector = null;
+        if (AmbientCollector.Value == this)
+            AmbientCollector.Value = null;
     }
 }
