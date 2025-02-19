@@ -45,7 +45,7 @@ public sealed class DiagnosticContext : IDiagnosticContext
     }
 
     /// <inheritdoc cref="IDiagnosticContext.Set"/>
-    public void Set(string propertyName, object value, bool destructureObjects = false)
+    public void Set(string propertyName, object? value, bool destructureObjects = false)
     {
         if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
 
