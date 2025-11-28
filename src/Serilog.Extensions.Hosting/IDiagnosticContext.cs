@@ -29,7 +29,7 @@ public interface IDiagnosticContext
     /// <param name="value">The property value.</param>
     /// <param name="destructureObjects">If true, the value will be serialized as structured
     /// data if possible; if false, the object will be recorded as a scalar or simple array.</param>
-    void Set(string propertyName, object value, bool destructureObjects = false);
+    void Set(string propertyName, object? value, bool destructureObjects = false);
 
     /// <summary>
     /// Set the specified exception on the current diagnostic context.

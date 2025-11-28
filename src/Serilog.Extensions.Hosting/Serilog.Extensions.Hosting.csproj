@@ -5,7 +5,7 @@
     <Authors>Microsoft;Serilog Contributors</Authors>
     <!-- These must match the Dependencies tab in https://www.nuget.org/packages/microsoft.extensions.hosting at
          the target version. -->
-    <TargetFrameworks>net462;netstandard2.0;netstandard2.1;net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net462;netstandard2.0;netstandard2.1;net8.0;net9.0;net10.0</TargetFrameworks>
     <PackageTags>serilog;aspnet;aspnetcore;hosting</PackageTags>
     <PackageIcon>icon.png</PackageIcon>
     <PackageProjectUrl>https://github.com/serilog/serilog-extensions-hosting</PackageProjectUrl>
@@ -26,18 +26,22 @@
     <DefineConstants>$(DefineConstants);FEATURE_MBPW</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net10.0' ">
+    <DefineConstants>$(DefineConstants);FEATURE_MBPW</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Include="..\..\assets\icon.png" Pack="true" Visible="false" PackagePath="" />
     <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
-    <PackageReference Include="Serilog" Version="4.2.0-*" />
+    <PackageReference Include="Serilog" Version="4.3.0" />
     <PackageReference Include="PolySharp" Version="1.14.1" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
     <!-- The versions of all references in this group must match the major and minor components of the package version prefix. -->
-    <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.0-*" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
   </ItemGroup>
 </Project>
