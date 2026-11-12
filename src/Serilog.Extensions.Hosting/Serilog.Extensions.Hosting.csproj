@@ -35,7 +35,7 @@
 
   <!-- The versions of all references in these groups must match the major and minor components of the package version prefix. -->
   <ItemGroup>
-    <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="11.0.0-dev-02501" />
   </ItemGroup>
 
   <!-- Note: The Microsoft.Extensions.*.Abstractions libraries are built in from .NET 11 -->
